@@ -1,7 +1,11 @@
 package org.dev.assistant
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,14 +13,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -24,6 +27,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +40,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import org.dev.assistant.themes.HomeTheme
+import org.dev.assistant.ui.ChatViewModel
+import org.dev.assistant.ui.Message
+import org.dev.assistant.ui.ReceiveMessage
+import org.dev.assistant.ui.SentMessage
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -48,41 +56,57 @@ fun App() {
 
 @Composable
 fun ChatScreen() {
+    val viewmodel = ChatViewModel()
+    val state = viewmodel.messages.collectAsState()
     Surface {
-        ChatContainer()
+        ChatContainer(state.value) {
+            viewmodel.sendMessage(it)
+        }
     }
 }
 
 @Composable
-fun ChatContainer() {
+fun ChatContainer(list: List<Message>, send: (String) -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        ChatList(list)
         ChatFooter(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .wrapContentHeight()
-        )
+        ) {
+            if(it.isNotBlank() || it.isNotEmpty())
+                send(it)
+//            it.takeUnless { !(it.isBlank() || it.isEmpty()) }?.let {
+//                send(it)
+//            }
+        }
     }
 }
 
 @Composable
-fun ChatFooter(modifier: Modifier = Modifier) {
+fun ChatFooter(modifier: Modifier = Modifier, send: (String) -> Unit) {
+    var text by remember { mutableStateOf("") }
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         ChatInput(
             modifier = Modifier.weight(1f)
-        )
+        ) {
+            text = it
+        }
         ChatSubmitButton(
             modifier = Modifier.padding(end = 16.dp)
-        )
+        ) {
+            send(text)
+        }
     }
 }
 
 @Composable
-fun ChatSubmitButton(modifier: Modifier = Modifier) {
+fun ChatSubmitButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
 //    Button(
 //        onClick = { /* Handle send action */ },
 //        shape = RoundedCornerShape(50),
@@ -91,10 +115,10 @@ fun ChatSubmitButton(modifier: Modifier = Modifier) {
 //        Icon(Icons.Filled.Done, contentDescription = "Send", tint = Color.White)
 //    }
     IconButton(
-        onClick = { /* Handle send action */ },
+        onClick = { onClick() },
         modifier = modifier.size(48.dp)
     ) {
-        Icon(Icons.Filled.Send, contentDescription = "Send",)
+        Icon(Icons.Filled.Send, contentDescription = "Send")
     }
 }
 
@@ -102,7 +126,8 @@ fun ChatSubmitButton(modifier: Modifier = Modifier) {
 fun ChatInput(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
-    colors: TextFieldColors = OutlinedTextFieldDefaults.colors()
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
+    onTextChange: (String) -> Unit
 ) {
     var text by remember { mutableStateOf(TextFieldValue("")) }
     var isFocused by remember { mutableStateOf(false) }
@@ -116,10 +141,7 @@ fun ChatInput(
                 minHeight = OutlinedTextFieldDefaults.MinHeight
             )
     ) {
-        Box(
-//            modifier = Modifier.padding(8.dp).fillMaxWidth()
-
-        ) {
+        Box {
             if (text.text.isEmpty() && !isFocused) {
                 Text(
                     "Enter text",
@@ -129,13 +151,74 @@ fun ChatInput(
             }
             BasicTextField(
                 value = text,
-                onValueChange = { text = it },
+                onValueChange = {
+                    text = it
+                    onTextChange(it.text)
+                },
                 modifier = Modifier
                     .padding(16.dp)
                     .matchParentSize()
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
                     }
+            )
+        }
+    }
+}
+
+@Composable
+fun ChatList(messages: List<Message>) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp)
+    ) {
+        items(messages){ it ->
+            when(it){
+                is SentMessage -> SentMessageItem(it)
+                is ReceiveMessage -> ReceiveMessageItem(it)
+            }
+
+        }
+    }
+}
+
+@Composable
+fun SentMessageItem(message: SentMessage) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.End
+    ) {
+        Box(
+            modifier = Modifier
+                .background(Color.Blue, shape = RoundedCornerShape(8.dp))
+                .padding(8.dp)
+        ) {
+            Text(
+                text = message.msg,
+                color = Color.White
+            )
+        }
+    }
+}
+
+@Composable
+fun ReceiveMessageItem(message: ReceiveMessage) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Box(
+            modifier = Modifier
+                .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                .padding(8.dp)
+        ) {
+            Text(
+                text = message.msg,
+                color = Color.Black
             )
         }
     }
