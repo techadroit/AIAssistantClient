@@ -5,7 +5,6 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
-import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
@@ -16,10 +15,14 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
+import org.dev.assistant.platform.getUrlProvider
 
 data class SocketMessage(val content: String)
 
 class WebSocketClient {
+//    var url = "ws://10.0.2.2:8000/ws"
+//    var url = "ws://127.0.0.1:8000/ws"
+    var url = getUrlProvider().wsUrl
     val scope = CoroutineScope(Dispatchers.IO + Job())
     private val client = HttpClient(CIO) {
         install(WebSockets)
@@ -41,10 +44,7 @@ class WebSocketClient {
     private suspend fun tryConnect() {
         try {
             client.webSocket(
-                method = HttpMethod.Get,
-                host = "10.0.2.2",
-                port = 8000,
-                path = "/ws"
+                urlString = url
             ) {
                 println(" client connected ")
                 session = this
