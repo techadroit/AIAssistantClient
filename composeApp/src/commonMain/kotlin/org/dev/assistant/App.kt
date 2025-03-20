@@ -78,9 +78,6 @@ fun ChatContainer(list: List<Message>, send: (String) -> Unit) {
         ) {
             if(it.isNotBlank() || it.isNotEmpty())
                 send(it)
-//            it.takeUnless { !(it.isBlank() || it.isEmpty()) }?.let {
-//                send(it)
-//            }
         }
     }
 }
@@ -93,7 +90,8 @@ fun ChatFooter(modifier: Modifier = Modifier, send: (String) -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         ChatInput(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            text = text
         ) {
             text = it
         }
@@ -101,6 +99,7 @@ fun ChatFooter(modifier: Modifier = Modifier, send: (String) -> Unit) {
             modifier = Modifier.padding(end = 16.dp)
         ) {
             send(text)
+            text = ""
         }
     }
 }
@@ -127,9 +126,10 @@ fun ChatInput(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
+    text:String,
     onTextChange: (String) -> Unit
 ) {
-    var text by remember { mutableStateOf(TextFieldValue("")) }
+//    var text by remember { mutableStateOf(TextFieldValue("")) }
     var isFocused by remember { mutableStateOf(false) }
 
     Surface(
@@ -142,7 +142,7 @@ fun ChatInput(
             )
     ) {
         Box {
-            if (text.text.isEmpty() && !isFocused) {
+            if (text.isEmpty() && !isFocused) {
                 Text(
                     "Enter text",
                     color = Color.Gray,
@@ -152,8 +152,8 @@ fun ChatInput(
             BasicTextField(
                 value = text,
                 onValueChange = {
-                    text = it
-                    onTextChange(it.text)
+//                    text = it
+                    onTextChange(it)
                 },
                 modifier = Modifier
                     .padding(16.dp)

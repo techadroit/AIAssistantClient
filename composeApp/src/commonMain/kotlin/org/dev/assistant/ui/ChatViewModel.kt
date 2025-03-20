@@ -2,10 +2,14 @@ package org.dev.assistant.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.dev.assistant.data.WebSocketClient
 
 //data class Message(val content: String, val isSent: Boolean)
@@ -22,12 +26,27 @@ class ChatViewModel : ViewModel() {
     init {
         viewModelScope.launch {
             websocketClient.connect()
+            receiveMessages()
         }
     }
 
     private suspend fun receiveMessages() {
-        websocketClient.messageFlow.collectLatest {
-            _messages.value += ReceiveMessage(it.content)
+        println("Am i event being called")
+        coroutineScope {
+            withContext(Dispatchers.IO) {
+                try {
+                    websocketClient.messageFlow
+                        .catch {
+                            println("Error: ${it.message}")
+                        }
+                        .collect {
+                            println("Received: ${it.content}")
+                            _messages.value += ReceiveMessage(it.content)
+                        }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
         }
     }
 

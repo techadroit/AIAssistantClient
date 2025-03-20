@@ -8,20 +8,37 @@ import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.launch
 
 data class SocketMessage(val content: String)
 
 class WebSocketClient {
+    val scope = CoroutineScope(Dispatchers.IO + Job())
     private val client = HttpClient(CIO) {
         install(WebSockets)
     }
 
-    val messageFlow = MutableSharedFlow<SocketMessage>()
+    val messageFlow = MutableSharedFlow<SocketMessage>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        extraBufferCapacity = 1
+    )
     private var session: DefaultClientWebSocketSession? = null
 
-    suspend fun connect() {
+    fun connect() {
+        scope.launch {
+            tryConnect()
+        }
+    }
+
+    private suspend fun tryConnect() {
         try {
             client.webSocket(
                 method = HttpMethod.Get,
@@ -52,9 +69,9 @@ class WebSocketClient {
             session.incoming.consumeAsFlow().collect { frame ->
                 if (frame is Frame.Text) {
                     val message = frame.readText()
+                    println("Received message: $message")
                     val sMessage = SocketMessage(message)
-                    messageFlow.emit(sMessage)
-                    println("Received: $message")
+                    messageFlow.tryEmit(sMessage)
                 }
             }
         } catch (e: Exception) {
