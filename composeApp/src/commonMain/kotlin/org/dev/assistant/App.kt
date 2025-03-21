@@ -19,14 +19,24 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -58,10 +68,88 @@ fun App() {
 fun ChatScreen() {
     val viewmodel = ChatViewModel()
     val state = viewmodel.messages.collectAsState()
+    val isConnected = viewmodel.isConnected.collectAsState()
+
     Surface {
-        ChatContainer(state.value) {
-            viewmodel.sendMessage(it)
+        Column {
+            ChatToolbar(
+                isConnected = isConnected.value,
+                onSettingsClick = { viewmodel.showSettingsMenu() },
+                onUrlChange = { viewmodel.updateUrl(it) },
+                onSwitchChange = { viewmodel.connect() }
+            )
+            ChatContainer(state.value) {
+                viewmodel.sendMessage(it)
+            }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChatToolbar(
+    isConnected: Boolean,
+    onSettingsClick: () -> Unit,
+    onUrlChange: (String) -> Unit,
+    onSwitchChange: (Boolean) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var url by remember { mutableStateOf("") }
+
+    TopAppBar(
+        title = { Text("Chat") },
+        actions = {
+            ConnectionSwitch(
+                checked = isConnected,
+                onCheckedChange = {
+                    onSwitchChange(it)
+                } // Read-only switch
+            )
+            IconButton(onClick = { expanded = true }) {
+                Icon(Icons.Default.MoreVert, contentDescription = "Settings")
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(text = { Text("Add URL") }, onClick = {
+                    expanded = false
+                    showDialog = true
+//                    onSettingsClick()
+                })
+            }
+        }
+    )
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+                expanded = false
+            },
+            title = { Text("Enter WebSocket URL") },
+            text = {
+                TextField(
+                    value = url,
+                    onValueChange = { url = it },
+                    label = { Text("URL") }
+                )
+            },
+            confirmButton = {
+                Button(onClick = {
+                    onUrlChange(url)
+                    expanded = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { expanded = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
@@ -215,4 +303,19 @@ fun ChatMessage(message: String, modifier: Modifier = Modifier) {
             color = Color.Black
         )
     }
+}
+
+@Composable
+fun ConnectionSwitch(
+    checked: Boolean,
+    onCheckedChange: ((Boolean) -> Unit)?
+) {
+    Switch(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        colors = SwitchDefaults.colors(
+            checkedThumbColor = Color.Green,
+            uncheckedThumbColor = MaterialTheme.colorScheme.primary
+        )
+    )
 }

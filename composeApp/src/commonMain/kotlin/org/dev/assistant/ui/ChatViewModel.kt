@@ -18,10 +18,11 @@ class ChatViewModel : ViewModel() {
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages
     val websocketClient = WebSocketClient()
+    private val _isConnected = MutableStateFlow(false)
+    val isConnected: StateFlow<Boolean> = _isConnected
 
     init {
         viewModelScope.launch {
-            websocketClient.connect()
             receiveMessages()
         }
     }
@@ -29,15 +30,12 @@ class ChatViewModel : ViewModel() {
     private suspend fun receiveMessages() {
         try {
             websocketClient.messageFlow
-                .catch {
-                    println("Error: ${it.message}")
-                }
-                .collect {
-                    println("Received: ${it.content}")
-                    _messages.value += ReceiveMessage(it.content)
+                .collect { socketMessage ->
+                    println("Collected from flow: ${socketMessage.content}")
+                    _messages.value += ReceiveMessage(socketMessage.content)
                 }
         } catch (e: Exception) {
-            e.printStackTrace()
+            println("Error collecting messages: ${e.message}")
         }
     }
 
@@ -45,6 +43,25 @@ class ChatViewModel : ViewModel() {
         viewModelScope.launch {
             _messages.value += SentMessage(content)
             websocketClient.sendMessage(content)
+        }
+    }
+
+    fun connect(){
+        viewModelScope.launch {
+            websocketClient.connect()
+            _isConnected.value = true
+        }
+    }
+
+    fun showSettingsMenu() {
+        // Logic to show settings menu
+    }
+
+    fun updateUrl(url: String) {
+        viewModelScope.launch {
+            websocketClient.updateUrl(url)
+            websocketClient.connect()
+            _isConnected.value = true
         }
     }
 }
