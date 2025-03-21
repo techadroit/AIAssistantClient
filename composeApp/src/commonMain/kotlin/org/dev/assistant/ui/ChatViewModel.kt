@@ -4,15 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import org.dev.assistant.data.WebSocketClient
+import org.dev.assistant.ui.pojo.Message
+import org.dev.assistant.ui.pojo.ReceiveMessage
+import org.dev.assistant.ui.pojo.SentMessage
 
-//data class Message(val content: String, val isSent: Boolean)
-
-sealed class Message(val content: String)
-data class SentMessage(val msg: String) : Message(msg)
-data class ReceiveMessage(val msg: String) : Message(msg)
 
 class ChatViewModel : ViewModel() {
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
@@ -47,13 +44,13 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-    fun connect(){
+    fun connect() {
         viewModelScope.launch {
             websocketClient.connect()
         }
     }
 
-    fun disconnect(){
+    fun disconnect() {
         viewModelScope.launch {
             websocketClient.disconnect()
         }
@@ -63,7 +60,7 @@ class ChatViewModel : ViewModel() {
         // Logic to show settings menu
     }
 
-    fun observeWebConnection(){
+    fun observeWebConnection() {
         viewModelScope.launch {
             websocketClient.isConnected.collect {
                 _isConnected.value = it

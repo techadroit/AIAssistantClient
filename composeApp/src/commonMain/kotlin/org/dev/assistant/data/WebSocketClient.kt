@@ -26,8 +26,6 @@ import org.dev.assistant.platform.getUrlProvider
 data class SocketMessage(val content: String)
 
 class WebSocketClient {
-    //    var url = "ws://10.0.2.2:8000/ws"
-    //    var url = "ws://127.0.0.1:8000/ws"
     var url = getUrlProvider().wsUrl
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val client = HttpClient(CIO) {
