@@ -53,6 +53,12 @@ class ChatViewModel : ViewModel() {
         }
     }
 
+    fun disconnect(){
+        viewModelScope.launch {
+            websocketClient.disconnect()
+        }
+    }
+
     fun showSettingsMenu() {
         // Logic to show settings menu
     }

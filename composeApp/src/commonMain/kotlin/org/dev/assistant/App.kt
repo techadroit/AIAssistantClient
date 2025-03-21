@@ -76,7 +76,12 @@ fun ChatScreen() {
                 isConnected = isConnected.value,
                 onSettingsClick = { viewmodel.showSettingsMenu() },
                 onUrlChange = { viewmodel.updateUrl(it) },
-                onSwitchChange = { viewmodel.connect() }
+                onSwitchChange = {
+                    if (it)
+                        viewmodel.connect()
+                    else
+                        viewmodel.disconnect()
+                }
             )
             ChatContainer(state.value) {
                 viewmodel.sendMessage(it)
