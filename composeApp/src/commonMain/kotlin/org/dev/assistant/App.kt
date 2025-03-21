@@ -2,9 +2,9 @@ package org.dev.assistant
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
@@ -37,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import org.dev.assistant.themes.HomeTheme
 import org.dev.assistant.ui.ChatViewModel
@@ -67,16 +67,17 @@ fun ChatScreen() {
 
 @Composable
 fun ChatContainer(list: List<Message>, send: (String) -> Unit) {
-    Box(
+    Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        ChatList(list)
+        ChatList(
+            messages = list,
+            modifier = Modifier.weight(1f)
+        )
         ChatFooter(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .wrapContentHeight()
+            modifier = Modifier.wrapContentHeight()
         ) {
-            if(it.isNotBlank() || it.isNotEmpty())
+            if (it.isNotBlank() || it.isNotEmpty())
                 send(it)
         }
     }
@@ -106,13 +107,6 @@ fun ChatFooter(modifier: Modifier = Modifier, send: (String) -> Unit) {
 
 @Composable
 fun ChatSubmitButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
-//    Button(
-//        onClick = { /* Handle send action */ },
-//        shape = RoundedCornerShape(50),
-//        modifier = modifier.size(48.dp)
-//    ) {
-//        Icon(Icons.Filled.Done, contentDescription = "Send", tint = Color.White)
-//    }
     IconButton(
         onClick = { onClick() },
         modifier = modifier.size(48.dp)
@@ -126,7 +120,7 @@ fun ChatInput(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
-    text:String,
+    text: String,
     onTextChange: (String) -> Unit
 ) {
 //    var text by remember { mutableStateOf(TextFieldValue("")) }
@@ -167,13 +161,13 @@ fun ChatInput(
 }
 
 @Composable
-fun ChatList(messages: List<Message>) {
+fun ChatList(messages: List<Message>, modifier: Modifier) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp)
     ) {
-        items(messages){ it ->
-            when(it){
+        items(messages) { it ->
+            when (it) {
                 is SentMessage -> SentMessageItem(it)
                 is ReceiveMessage -> ReceiveMessageItem(it)
             }
@@ -190,16 +184,7 @@ fun SentMessageItem(message: SentMessage) {
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.End
     ) {
-        Box(
-            modifier = Modifier
-                .background(Color.Blue, shape = RoundedCornerShape(8.dp))
-                .padding(8.dp)
-        ) {
-            Text(
-                text = message.msg,
-                color = Color.White
-            )
-        }
+        ChatMessage(message.msg)
     }
 }
 
@@ -211,15 +196,23 @@ fun ReceiveMessageItem(message: ReceiveMessage) {
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.Start
     ) {
-        Box(
-            modifier = Modifier
-                .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                .padding(8.dp)
-        ) {
-            Text(
-                text = message.msg,
-                color = Color.Black
+        ChatMessage(message.msg)
+    }
+}
+
+@Composable
+fun ChatMessage(message: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .background(
+                MaterialTheme.colorScheme.onSurface,
+                shape = RoundedCornerShape(8.dp)
             )
-        }
+            .padding(8.dp)
+    ) {
+        Text(
+            text = message,
+            color = Color.Black
+        )
     }
 }
