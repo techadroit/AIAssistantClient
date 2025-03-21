@@ -97,11 +97,16 @@ fun ChatToolbar(
     var showDialog by remember { mutableStateOf(false) }
     var url by remember { mutableStateOf("") }
 
+    fun hideDialog() {
+        expanded = false
+        showDialog = false
+    }
+
     TopAppBar(
         title = { Text("Chat") },
         actions = {
             ConnectionSwitch(
-                checked = isConnected,
+                isConnected = isConnected,
                 onCheckedChange = {
                     onSwitchChange(it)
                 } // Read-only switch
@@ -125,8 +130,7 @@ fun ChatToolbar(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = {
-                showDialog = false
-                expanded = false
+                hideDialog()
             },
             title = { Text("Enter WebSocket URL") },
             text = {
@@ -139,13 +143,15 @@ fun ChatToolbar(
             confirmButton = {
                 Button(onClick = {
                     onUrlChange(url)
-                    expanded = false
+                    hideDialog()
                 }) {
                     Text("OK")
                 }
             },
             dismissButton = {
-                Button(onClick = { expanded = false }) {
+                Button(onClick = {
+                    hideDialog()
+                }) {
                     Text("Cancel")
                 }
             }
@@ -307,15 +313,19 @@ fun ChatMessage(message: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun ConnectionSwitch(
-    checked: Boolean,
-    onCheckedChange: ((Boolean) -> Unit)?
+    isConnected: Boolean,
+    onCheckedChange: ((Boolean) -> Unit)
 ) {
+    var isChecked by remember { mutableStateOf(false) }
     Switch(
-        checked = checked,
-        onCheckedChange = onCheckedChange,
+        checked = isChecked,
+        onCheckedChange = {
+            isChecked = it
+            onCheckedChange(it)
+        },
         colors = SwitchDefaults.colors(
-            checkedThumbColor = Color.Green,
-            uncheckedThumbColor = MaterialTheme.colorScheme.primary
+            checkedThumbColor = if (isConnected) Color.Green else Color.Red,
+            uncheckedThumbColor = Color.White
         )
     )
 }

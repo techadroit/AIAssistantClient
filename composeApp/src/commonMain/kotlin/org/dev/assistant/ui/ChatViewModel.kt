@@ -23,6 +23,7 @@ class ChatViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
+            observeWebConnection()
             receiveMessages()
         }
     }
@@ -49,7 +50,6 @@ class ChatViewModel : ViewModel() {
     fun connect(){
         viewModelScope.launch {
             websocketClient.connect()
-            _isConnected.value = true
         }
     }
 
@@ -57,11 +57,18 @@ class ChatViewModel : ViewModel() {
         // Logic to show settings menu
     }
 
+    fun observeWebConnection(){
+        viewModelScope.launch {
+            websocketClient.isConnected.collect {
+                _isConnected.value = it
+            }
+        }
+    }
+
     fun updateUrl(url: String) {
         viewModelScope.launch {
             websocketClient.updateUrl(url)
-            websocketClient.connect()
-            _isConnected.value = true
+            connect()
         }
     }
 }

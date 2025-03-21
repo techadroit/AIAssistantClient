@@ -12,7 +12,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import org.dev.assistant.platform.getUrlProvider
@@ -21,7 +24,7 @@ data class SocketMessage(val content: String)
 
 class WebSocketClient {
     //    var url = "ws://10.0.2.2:8000/ws"
-//    var url = "ws://127.0.0.1:8000/ws"
+    //    var url = "ws://127.0.0.1:8000/ws"
     var url = getUrlProvider().wsUrl
     val scope = CoroutineScope(Dispatchers.IO + Job())
     private val client = HttpClient(CIO) {
@@ -33,10 +36,13 @@ class WebSocketClient {
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
         extraBufferCapacity = 1
     )
+    private val _isConnected = MutableStateFlow(false)
+    val isConnected: StateFlow<Boolean> get() = _isConnected
     private var session: DefaultClientWebSocketSession? = null
 
     fun connect() {
         scope.launch {
+            delay(5000)
             tryConnect()
         }
     }
@@ -47,12 +53,14 @@ class WebSocketClient {
                 urlString = url
             ) {
                 println(" client connected ")
+                _isConnected.value = true
                 session = this
                 receiveMessages(this)
                 // this: DefaultClientWebSocketSession
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            _isConnected.value = true
         }
     }
 
@@ -76,6 +84,7 @@ class WebSocketClient {
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            _isConnected.value = false
         }
     }
 
