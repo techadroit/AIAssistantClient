@@ -30,7 +30,7 @@ class WebSocketClient {
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val client = HttpClient(CIO) {
         install(WebSockets) {
-            pingInterval = 5000
+            pingInterval = 50000
         }
     }
 

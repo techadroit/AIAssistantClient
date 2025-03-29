@@ -20,6 +20,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -45,6 +46,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import org.dev.assistant.ui.pojo.Message
@@ -69,6 +73,9 @@ fun ChatScreen() {
                         viewmodel.connect()
                     else
                         viewmodel.disconnect()
+                },
+                onRefresh = {
+                    viewmodel.refresh()
                 }
             )
             ChatContainer(state.value) {
@@ -84,7 +91,8 @@ fun ChatToolbar(
     isConnected: Boolean,
     onSettingsClick: () -> Unit,
     onUrlChange: (String) -> Unit,
-    onSwitchChange: (Boolean) -> Unit
+    onSwitchChange: (Boolean) -> Unit,
+    onRefresh: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
@@ -104,6 +112,9 @@ fun ChatToolbar(
                     onSwitchChange(it)
                 } // Read-only switch
             )
+            IconButton(onClick = { onRefresh() }) {
+                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+            }
             IconButton(onClick = { expanded = true }) {
                 Icon(Icons.Default.MoreVert, contentDescription = "Settings")
             }
@@ -179,7 +190,10 @@ fun ChatFooter(modifier: Modifier = Modifier, send: (String) -> Unit) {
     ) {
         ChatInput(
             modifier = Modifier.weight(1f),
-            text = text
+            text = text,
+            onSend = {
+                send(text)
+            }
         ) {
             text = it
         }
@@ -208,7 +222,8 @@ fun ChatInput(
     textStyle: TextStyle = LocalTextStyle.current,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
     text: String,
-    onTextChange: (String) -> Unit
+    onSend: () -> Unit = {},
+    onTextChange: (String) -> Unit,
 ) {
 //    var text by remember { mutableStateOf(TextFieldValue("")) }
     var isFocused by remember { mutableStateOf(false) }
@@ -239,6 +254,18 @@ fun ChatInput(
                 modifier = Modifier
                     .padding(16.dp)
                     .matchParentSize()
+                    .onKeyEvent { keyEvent ->
+                        // Check if Enter key is pressed down
+                        if (keyEvent.type == androidx.compose.ui.input.key.KeyEventType.KeyDown &&
+                            keyEvent.key == androidx.compose.ui.input.key.Key.Enter ||
+                            keyEvent.key == androidx.compose.ui.input.key.Key.NumPadEnter
+                        ) {
+                            onSend()
+                            true
+                        } else {
+                            false
+                        }
+                    }
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
                     }

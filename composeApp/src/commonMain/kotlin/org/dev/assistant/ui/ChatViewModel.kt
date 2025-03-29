@@ -44,6 +44,16 @@ class ChatViewModel : ViewModel() {
         }
     }
 
+    fun refresh(){
+        disconnect()
+        clearChatHistory()
+        connect()
+    }
+
+    fun clearChatHistory(){
+        _messages.value = emptyList()
+    }
+
     fun connect() {
         viewModelScope.launch {
             websocketClient.connect()
