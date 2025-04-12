@@ -1,21 +1,23 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop.
+# AI Assistant Chat Application
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+This is a Compose Multiplatform project designed for Android, iOS, Desktop, and Web platforms. 
+The application serves as an AI assistant where users can connect to a WebSocket backend server and start chatting.
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Features
 
+- **Cross-platform support**: Built using Compose Multiplatform, the app runs on Android, iOS, Desktop, and Web.
+- **WebSocket communication**: Connects to a backend WebSocket server for real-time messaging.
+- **AI assistant**: Chat with the assistant in real-time.
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+## Libraries Used
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
+- [Ktor](https://ktor.io/) for WebSocket communication.
 
-You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle task.
+## Getting Started
+
+- https://www.jetbrains.com/compose-multiplatform/
+
+### Prerequisites
+
+- Ensure you have the required development environment set up for Compose Multiplatform.
+- A WebSocket server URL is required to connect the application to the backend.
