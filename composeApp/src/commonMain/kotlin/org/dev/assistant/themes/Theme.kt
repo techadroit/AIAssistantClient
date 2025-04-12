@@ -55,11 +55,14 @@ fun HomeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
+    /*
+    Enable this to support light and dark mode
+     */
+//    val colors = if (darkTheme) {
+//        DarkColorPalette
+//    } else {
+//        LightColorPalette
+//    }
 
 //    val view = LocalView.current
 //    if (!view.isInEditMode) {
@@ -70,7 +73,7 @@ fun HomeTheme(
 //        }
 //    }
 
-    AppTheme(darkTheme = darkTheme, colors = colors, content = content)
+    AppTheme(darkTheme = darkTheme, colors = LightColorPalette, content = content)
 }
 //
 //@Composable

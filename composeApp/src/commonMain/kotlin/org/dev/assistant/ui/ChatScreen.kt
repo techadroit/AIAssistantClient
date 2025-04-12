@@ -51,9 +51,11 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import org.dev.assistant.themes.getChatBackgroundColor
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.ReceiveMessage
 import org.dev.assistant.ui.pojo.SentMessage
+import org.dev.assistant.util.edgeShadow
 
 
 @Composable
@@ -128,7 +130,8 @@ fun ChatToolbar(
 //                    onSettingsClick()
                 })
             }
-        }
+        },
+        modifier = Modifier.edgeShadow()
     )
 
     if (showDialog) {
@@ -321,7 +324,7 @@ fun ChatMessage(message: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .background(
-                MaterialTheme.colorScheme.onSurface,
+                MaterialTheme.colorScheme.getChatBackgroundColor(),
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(8.dp)
