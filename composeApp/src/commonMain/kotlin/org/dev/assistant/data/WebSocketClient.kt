@@ -84,7 +84,9 @@ class WebSocketClient {
 
     suspend fun sendMessage(content: String) {
         try {
-            session?.send(Frame.Text(content))
+            val sendingText = Frame.Text(content)
+            println(" sending message $content")
+            session?.send(sendingText)
         } catch (e: Exception) {
             e.printStackTrace()
         }

@@ -47,7 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -184,6 +184,11 @@ fun ChatContainer(list: List<Message>, send: (String) -> Unit) {
 @Composable
 fun ChatFooter(modifier: Modifier = Modifier, send: (String) -> Unit) {
     var text by remember { mutableStateOf("") }
+
+    fun resetText(){
+        text = ""
+    }
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -193,6 +198,7 @@ fun ChatFooter(modifier: Modifier = Modifier, send: (String) -> Unit) {
             text = text,
             onSend = {
                 send(text)
+                resetText()
             }
         ) {
             text = it
@@ -201,7 +207,7 @@ fun ChatFooter(modifier: Modifier = Modifier, send: (String) -> Unit) {
             modifier = Modifier.padding(end = 16.dp)
         ) {
             send(text)
-            text = ""
+            resetText()
         }
     }
 }
@@ -225,40 +231,36 @@ fun ChatInput(
     onSend: () -> Unit = {},
     onTextChange: (String) -> Unit,
 ) {
-//    var text by remember { mutableStateOf(TextFieldValue("")) }
     var isFocused by remember { mutableStateOf(false) }
 
     Surface(
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, Color.Gray),
-        modifier = modifier.padding(16.dp)
+        modifier = modifier
+            .padding(16.dp)
             .fillMaxWidth()
-            .defaultMinSize(
-                minHeight = OutlinedTextFieldDefaults.MinHeight
-            )
+            .defaultMinSize(minHeight = OutlinedTextFieldDefaults.MinHeight)
     ) {
         Box {
             if (text.isEmpty() && !isFocused) {
                 Text(
                     "Enter text",
                     color = Color.Gray,
-                    modifier = Modifier.align(Alignment.CenterStart).padding(start = 16.dp)
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 16.dp)
                 )
             }
             BasicTextField(
                 value = text,
-                onValueChange = {
-//                    text = it
-                    onTextChange(it)
-                },
+                onValueChange = onTextChange,
                 modifier = Modifier
                     .padding(16.dp)
                     .matchParentSize()
-                    .onKeyEvent { keyEvent ->
-                        // Check if Enter key is pressed down
+                    .onPreviewKeyEvent { keyEvent ->
                         if (keyEvent.type == androidx.compose.ui.input.key.KeyEventType.KeyDown &&
-                            keyEvent.key == androidx.compose.ui.input.key.Key.Enter ||
-                            keyEvent.key == androidx.compose.ui.input.key.Key.NumPadEnter
+                            (keyEvent.key == androidx.compose.ui.input.key.Key.Enter ||
+                                    keyEvent.key == androidx.compose.ui.input.key.Key.NumPadEnter)
                         ) {
                             onSend()
                             true
