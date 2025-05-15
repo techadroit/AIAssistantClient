@@ -6,5 +6,5 @@ actual fun getUrlProvider(): UrlProvider {
 
 class AndroidUrlProvider : UrlProvider {
     override val wsUrl: String
-        get() = "ws://10.0.2.2:8000/ws"
+        get() = "ws://10.0.2.2:8001/ws"
 }
