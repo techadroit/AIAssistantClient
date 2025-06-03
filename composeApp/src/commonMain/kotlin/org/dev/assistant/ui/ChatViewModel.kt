@@ -9,6 +9,7 @@ import org.dev.assistant.data.WebSocketClient
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.ReceiveMessage
 import org.dev.assistant.ui.pojo.SentMessage
+import org.dev.assistant.util.MessageParser
 
 
 class ChatViewModel : ViewModel() {
@@ -30,7 +31,7 @@ class ChatViewModel : ViewModel() {
             websocketClient.messageFlow
                 .collect { socketMessage ->
                     println("Collected from flow: ${socketMessage.content}")
-                    _messages.value += ReceiveMessage(socketMessage.content)
+                    _messages.value += MessageParser.parseMessage(socketMessage)
                 }
         } catch (e: Exception) {
             println("Error collecting messages: ${e.message}")
@@ -39,7 +40,7 @@ class ChatViewModel : ViewModel() {
 
     fun sendMessage(content: String) {
         viewModelScope.launch {
-            _messages.value += SentMessage(content)
+            _messages.value += SentMessage(msg = content)
             websocketClient.sendMessage(content)
         }
     }

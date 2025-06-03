@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 kotlin {
@@ -55,12 +56,25 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.websockets)
-            implementation(libs.coil.core)
-            implementation(libs.coil.compose)
+//            implementation(libs.coil.core)
+//            implementation(libs.coil.compose)
+//            implementation(libs.coil.network.ktor)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.ktor.client.java)
+//            implementation(libs.coil.compose)
+//            implementation(compose.desktop.common)
+        }
+
+
+    }
+    jvmToolchain(17)
+    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
+        binaries.all {
+            // Enable debug symbols
+            freeCompilerArgs += "-Xdebug-symbols"
         }
     }
 }

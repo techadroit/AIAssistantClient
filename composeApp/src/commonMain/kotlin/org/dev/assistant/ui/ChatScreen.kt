@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -51,6 +52,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+//import coil3.compose.AsyncImage
 import org.dev.assistant.themes.getChatBackgroundColor
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.ReceiveMessage
@@ -188,7 +190,7 @@ fun ChatContainer(list: List<Message>, send: (String) -> Unit) {
 fun ChatFooter(modifier: Modifier = Modifier, send: (String) -> Unit) {
     var text by remember { mutableStateOf("") }
 
-    fun resetText(){
+    fun resetText() {
         text = ""
     }
 
@@ -303,7 +305,7 @@ fun SentMessageItem(message: SentMessage) {
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.End
     ) {
-        ChatMessage(message.msg)
+        ChatMessage(message)
     }
 }
 
@@ -315,12 +317,12 @@ fun ReceiveMessageItem(message: ReceiveMessage) {
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.Start
     ) {
-        ChatMessage(message.msg)
+        ChatMessage(message)
     }
 }
 
 @Composable
-fun ChatMessage(message: String, modifier: Modifier = Modifier) {
+fun ChatMessage(message: Message, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .background(
@@ -329,10 +331,32 @@ fun ChatMessage(message: String, modifier: Modifier = Modifier) {
             )
             .padding(8.dp)
     ) {
-        Text(
-            text = message,
-            color = Color.Black
-        )
+        Column {
+            Text(
+                text = message.msg,
+                style = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
+            )
+            when (message) {
+                is ReceiveMessage -> {
+                    LazyRow {
+                        items(message.imageUrl) {
+                            Text(it)
+
+//                            AsyncImage(
+//                                model = it,
+//                                contentDescription = null,
+//                                modifier = Modifier
+//                                    .size(100.dp)
+//                                    .padding(4.dp)
+//                                    .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
+//                            )
+                        }
+                    }
+                }
+
+                is SentMessage -> {}
+            }
+        }
     }
 }
 
