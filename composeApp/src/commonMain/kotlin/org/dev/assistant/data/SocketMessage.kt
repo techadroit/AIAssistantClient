@@ -14,7 +14,20 @@ data class SocketMessage(
     @SerialName("error_code")
     val errorCode: String?,
     @SerialName("content")
-    val content: Map<String, String> = emptyMap(),
+    val content: Content = Content(),
     @SerialName("content_type")
     val contentType: String
+)
+
+@Serializable
+data class Content(
+    val products: List<Product> = emptyList()
+)
+
+@Serializable
+data class Product(
+    val name: String,
+    val price: Double,
+    @SerialName("image_url")
+    val imageUrl: String
 )
