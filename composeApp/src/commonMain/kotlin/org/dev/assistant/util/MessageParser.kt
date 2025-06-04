@@ -11,7 +11,7 @@ object MessageParser {
 
         return ReceiveMessage(
             msg = message.responseMessage ?: "",
-            imageUrl = emptyList(),
+            products = message.content.products,
             messageType = "text"
         )
     }

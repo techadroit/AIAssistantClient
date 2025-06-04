@@ -57,6 +57,7 @@ import org.dev.assistant.themes.getChatBackgroundColor
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.ReceiveMessage
 import org.dev.assistant.ui.pojo.SentMessage
+import org.dev.assistant.util.UrlImage
 import org.dev.assistant.util.edgeShadow
 
 
@@ -332,24 +333,14 @@ fun ChatMessage(message: Message, modifier: Modifier = Modifier) {
             .padding(8.dp)
     ) {
         Column {
-            Text(
-                text = message.msg,
-                style = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
-            )
+            CommonText(message.msg)
             when (message) {
                 is ReceiveMessage -> {
                     LazyRow {
-                        items(message.imageUrl) {
-                            Text(it)
-
-//                            AsyncImage(
-//                                model = it,
-//                                contentDescription = null,
-//                                modifier = Modifier
-//                                    .size(100.dp)
-//                                    .padding(4.dp)
-//                                    .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
-//                            )
+                        items(message.products) {
+                            CommonText(it.name)
+                            CommonText(it.price.toString())
+                            UrlImage(it.imageUrl)
                         }
                     }
                 }
@@ -358,5 +349,13 @@ fun ChatMessage(message: Message, modifier: Modifier = Modifier) {
             }
         }
     }
+}
+
+@Composable
+fun CommonText(message: String, color: Color = Color.Black) {
+    Text(
+        text = message,
+        style = MaterialTheme.typography.bodyLarge.copy(color = color)
+    )
 }
 
