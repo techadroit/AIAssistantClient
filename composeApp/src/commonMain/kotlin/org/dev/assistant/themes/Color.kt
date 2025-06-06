@@ -28,6 +28,8 @@ val onPrimaryLight = Color(0xFF000000)
 
 val lightGrayColor = Color(0xFF9E9E9E)
 val chatBackgroundColor = Color(0xFFF5F5F5)
+val cardBackground = Color(0xFFF3f1f3)
+val priceColor = Color(0xFF0A5147)
 
 // colors for use interest screen
 val surfaceColor = Color(0xFFFEDBD0)
@@ -37,4 +39,12 @@ val secondaryColor = Color(0xFF442C2E)
 
 fun ColorScheme.getChatBackgroundColor(): Color {
     return chatBackgroundColor
+}
+
+fun ColorScheme.productCartBackground(): Color {
+    return cardBackground
+}
+
+fun ColorScheme.getPriceColor(): Color {
+    return priceColor
 }

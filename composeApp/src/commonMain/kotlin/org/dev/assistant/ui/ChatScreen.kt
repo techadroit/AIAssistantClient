@@ -1,5 +1,6 @@
 package org.dev.assistant.ui
 
+//import coil3.compose.AsyncImage
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -52,9 +54,14 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-//import coil3.compose.AsyncImage
+import androidx.compose.ui.unit.sp
+import org.dev.assistant.data.Product
 import org.dev.assistant.themes.getChatBackgroundColor
+import org.dev.assistant.themes.getPriceColor
+import org.dev.assistant.themes.productCartBackground
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.ReceiveMessage
 import org.dev.assistant.ui.pojo.SentMessage
@@ -333,20 +340,34 @@ fun ChatMessage(message: Message, modifier: Modifier = Modifier) {
             )
             .padding(8.dp)
     ) {
-        Column {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
             CommonText(message.msg)
+            Divider8()
             when (message) {
                 is ReceiveMessage -> {
                     LazyRow {
                         items(message.products) { product ->
-                            Column {
-                                UrlImage(product.imageUrl)
+                            Card(
+                                backgroundColor = MaterialTheme.colorScheme.productCartBackground(),
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Column {
+                                    UrlImage(product.imageUrl)
+                                    PaddingBox {
+                                        CommonText(product.name)
+                                    }
+                                    PaddingBox {
+                                        CommonTextBold(
+                                            product.price.toString() + " $",
+                                            color = MaterialTheme.colorScheme.getPriceColor(),
+                                            fontSize = 21.sp
+                                        )
+                                    }
+                                }
                                 Divider16()
-                                CommonText(product.name)
-                                Divider8()
-                                CommonText(product.price.toString(), color = Color.Green)
                             }
-                            Divider16()
                         }
                     }
                 }
@@ -358,10 +379,47 @@ fun ChatMessage(message: Message, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CommonText(message: String, color: Color = Color.Black) {
+fun PreviewChatMessage() {
+    val sampleProduct = Product(
+        imageUrl = "https://via.placeholder.com/150",
+        name = "Sample Product",
+        price = 19.99
+    )
+    val receiveMessage = ReceiveMessage(
+        msg = "Here are some products:",
+        products = listOf(
+            sampleProduct,
+            sampleProduct.copy(name = "Another Product", price = 29.99)
+        ),
+        messageType = "product"
+    )
+    val sentMessage = SentMessage(
+        msg = "Thank you!"
+    )
+    Column {
+        ChatMessage(message = receiveMessage)
+        Spacer(modifier = Modifier.size(16.dp))
+        ChatMessage(message = sentMessage)
+    }
+}
+
+@Composable
+fun CommonText(message: String, color: Color = Color.Black, fontSize: TextUnit = 18.sp) {
     Text(
         text = message,
-        style = MaterialTheme.typography.bodyLarge.copy(color = color)
+        style = MaterialTheme.typography.bodyLarge.copy(color = color, fontSize = fontSize)
+    )
+}
+
+@Composable
+fun CommonTextBold(message: String, color: Color = Color.Black, fontSize: TextUnit = 16.sp) {
+    Text(
+        text = message,
+        style = MaterialTheme.typography.bodyLarge.copy(
+            color = color,
+            fontWeight = FontWeight.Bold,
+            fontSize = fontSize
+        )
     )
 }
 
@@ -373,5 +431,15 @@ fun Divider8(modifier: Modifier = Modifier) {
 @Composable
 fun Divider16(modifier: Modifier = Modifier) {
     Spacer(modifier.size(16.dp))
+}
+
+@Composable
+fun PaddingBox(content: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier
+            .padding(8.dp)
+    ) {
+        content()
+    }
 }
 

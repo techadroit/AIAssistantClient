@@ -38,6 +38,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.jetbrains.ui.tooling.preview)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -59,11 +60,14 @@ kotlin {
 //            implementation(libs.coil.core)
 //            implementation(libs.coil.compose)
 //            implementation(libs.coil.network.ktor)
+            implementation(libs.jetbrains.ui.tooling.preview)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.java)
+            implementation(libs.jetbrains.ui.tooling.preview)
+
 //            implementation(libs.coil.compose)
 //            implementation(compose.desktop.common)
         }
