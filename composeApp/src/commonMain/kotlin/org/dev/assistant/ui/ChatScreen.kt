@@ -338,14 +338,15 @@ fun ChatMessage(message: Message, modifier: Modifier = Modifier) {
             when (message) {
                 is ReceiveMessage -> {
                     LazyRow {
-                        items(message.products) {
+                        items(message.products) { product ->
                             Column {
-                                UrlImage(it.imageUrl)
+                                UrlImage(product.imageUrl)
                                 Divider16()
-                                CommonText(it.name)
+                                CommonText(product.name)
                                 Divider8()
-                                CommonText(it.price.toString(), color = Color.Green)
+                                CommonText(product.price.toString(), color = Color.Green)
                             }
+                            Divider16()
                         }
                     }
                 }

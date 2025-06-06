@@ -43,6 +43,8 @@ fun UrlImage(
     // Remove the extension from the filename
     val resourceName = fileName.substringBeforeLast('.')
 
+    println("Loading image resource: $resourceName")
+
     // Load the resource using the extracted name
     Image(
         painter = painterResource(drawableMap[resourceName] ?: Res.drawable.adidas_running_red),
