@@ -12,6 +12,10 @@ import aiassistant.composeapp.generated.resources.nike_hiking_red
 import aiassistant.composeapp.generated.resources.nike_kids_running_white
 import aiassistant.composeapp.generated.resources.nike_trail_brown
 import aiassistant.composeapp.generated.resources.nike_walking_white
+import aiassistant.composeapp.generated.resources.vans_classic_white
+import aiassistant.composeapp.generated.resources.vans_skateboarding_blue
+import aiassistant.composeapp.generated.resources.vans_skateboarding_brown
+import aiassistant.composeapp.generated.resources.vans_slipon_blue
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable

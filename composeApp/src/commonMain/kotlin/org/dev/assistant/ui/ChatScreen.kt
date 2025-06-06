@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -338,9 +339,13 @@ fun ChatMessage(message: Message, modifier: Modifier = Modifier) {
                 is ReceiveMessage -> {
                     LazyRow {
                         items(message.products) {
-                            CommonText(it.name)
-                            CommonText(it.price.toString())
-                            UrlImage(it.imageUrl)
+                            Column {
+                                UrlImage(it.imageUrl)
+                                Divider16()
+                                CommonText(it.name)
+                                Divider8()
+                                CommonText(it.price.toString(), color = Color.Green)
+                            }
                         }
                     }
                 }
@@ -357,5 +362,15 @@ fun CommonText(message: String, color: Color = Color.Black) {
         text = message,
         style = MaterialTheme.typography.bodyLarge.copy(color = color)
     )
+}
+
+@Composable
+fun Divider8(modifier: Modifier = Modifier) {
+    Spacer(modifier.size(8.dp))
+}
+
+@Composable
+fun Divider16(modifier: Modifier = Modifier) {
+    Spacer(modifier.size(16.dp))
 }
 
