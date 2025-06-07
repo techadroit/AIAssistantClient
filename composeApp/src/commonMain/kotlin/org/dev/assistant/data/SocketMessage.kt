@@ -12,7 +12,7 @@ data class SocketMessage(
     @SerialName("error_message")
     val errorMessage: String?,
     @SerialName("error_code")
-    val errorCode: String?,
+    val errorCode: Int?,
     @SerialName("content")
     val content: Content = Content(),
     @SerialName("content_type")

@@ -49,7 +49,7 @@ class WebSocketClient {
         scope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    tryConnect(url)
+                    tryConnect(url+"/${generateRandomId()}")
                 } catch (e: Exception) {
                     e.printStackTrace()
                     _isConnected.value = false
@@ -128,4 +128,16 @@ class WebSocketClient {
             url = newUrl
         }
     }
+}
+
+/**
+ * Generates a random alphanumeric ID with the specified length.
+ * @param length The length of the ID to generate (default: 16 characters)
+ * @return A random alphanumeric string
+ */
+fun generateRandomId(length: Int = 10): String {
+    val allowedChars = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+    return (1..length)
+        .map { allowedChars.random() }
+        .joinToString("")
 }

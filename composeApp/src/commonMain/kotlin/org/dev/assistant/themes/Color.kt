@@ -28,7 +28,7 @@ val onPrimaryLight = Color(0xFF000000)
 
 val lightGrayColor = Color(0xFF9E9E9E)
 val chatBackgroundColor = Color(0xFFF5F5F5)
-val cardBackground = Color(0xFFF3f1f3)
+val cardBackground = Color(0xFFFFFFFF)
 val priceColor = Color(0xFF0A5147)
 
 // colors for use interest screen
