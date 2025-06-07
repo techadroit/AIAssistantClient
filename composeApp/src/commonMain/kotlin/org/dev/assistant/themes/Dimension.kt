@@ -22,44 +22,45 @@ fun createDimension(
     cardVerticalPadding: Dp = 8.dp,
     contentPadding: Dp = 80.dp,
     videoListGrid: GridCells = GridCells.Fixed(2),
-
-    ) = Dimension().apply {
-    this.paddingBody = paddingBody
-    this.paddingTitle = paddingTitle
-    this.paddingSubtitle = paddingSubtitle
-    this.thumbnailHeight = thumbnailHeight
-    this.thumbnailWidth = thumbnailWidth
-    this.cardHeight = cardHeight
-    this.cardHorizontalPadding = cardHorizontalPadding
-    this.paddingPara = paddingPara
-    this.cardVerticalPadding = cardVerticalPadding
-    this.contentPadding = contentPadding
-    this.videoListGrid = videoListGrid
-}
+    elevation: Dp = 4.dp
+) = Dimension(
+    paddingBody = paddingBody,
+    paddingTitle = paddingTitle,
+    paddingSubtitle = paddingSubtitle,
+    thumbnailHeight = thumbnailHeight,
+    thumbnailWidth = thumbnailWidth,
+    cardHeight = cardHeight,
+    cardHorizontalPadding = cardHorizontalPadding,
+    paddingPara = paddingPara,
+    cardVerticalPadding = cardVerticalPadding,
+    contentPadding = contentPadding,
+    videoListGrid = videoListGrid,
+    elevation = elevation
+)
 
 fun compactDimension() = createDimension()
 fun mediumDimension() = createDimension()
 fun expandedDimension() = createDimension()
 
-class Dimension {
-    var spacingXs = 4.dp
-    var spacingSmall = 8.dp
-    var spacingMedium = 12.dp
-    var spacingLarge = 16.dp
-    var spacingXLarge = 32.dp
-    var paddingBody = 8.dp
-    var paddingTitle = 12.dp
-    var paddingSubtitle = 8.dp
-    var paddingPara = 4.dp
-    var thumbnailHeight = 180.dp
-    var thumbnailWidth = 160.dp
-    var cardHeight = 230.dp
-    var cardHorizontalPadding = 12.dp
-    var cardVerticalPadding = 8.dp
-    var contentPadding = 80.dp
-    var videoListGrid: GridCells = GridCells.Fixed(2)
-    /// used to assign max width for a content in tab mode
-    var maxContentWidth: Dp = 400.dp
-}
+data class Dimension(
+    val spacingXs: Dp = 4.dp,
+    val spacingSmall: Dp = 8.dp,
+    val spacingMedium: Dp = 12.dp,
+    val spacingLarge: Dp = 16.dp,
+    val spacingXLarge: Dp = 32.dp,
+    val paddingBody: Dp = 8.dp,
+    val paddingTitle: Dp = 12.dp,
+    val paddingSubtitle: Dp = 8.dp,
+    val paddingPara: Dp = 4.dp,
+    val thumbnailHeight: Dp = 180.dp,
+    val thumbnailWidth: Dp = 160.dp,
+    val cardHeight: Dp = 230.dp,
+    val cardHorizontalPadding: Dp = 12.dp,
+    val cardVerticalPadding: Dp = 8.dp,
+    val contentPadding: Dp = 80.dp,
+    val videoListGrid: GridCells = GridCells.Fixed(2),
+    val maxContentWidth: Dp = 400.dp,
+    val elevation: Dp
+)
 
-val LocalDimensionProvider = compositionLocalOf { Dimension() }
+val LocalDimensionProvider = compositionLocalOf { createDimension() }

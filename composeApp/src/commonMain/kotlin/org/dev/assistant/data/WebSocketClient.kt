@@ -21,16 +21,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import org.dev.assistant.platform.getUrlProvider
 
-data class SocketMessage(val content: String)
+//data class SocketMessage(val content: String)
 
 class WebSocketClient {
+    private val json = Json { ignoreUnknownKeys = true }
     var url = getUrlProvider().wsUrl
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val client = HttpClient(CIO) {
         install(WebSockets) {
-            pingInterval = 50000
+//            pingInterval = 50000
         }
     }
 
@@ -110,8 +112,8 @@ class WebSocketClient {
                 if (frame is Frame.Text) {
                     val message = frame.readText()
                     println("Received message: $message")
-                    val sMessage = SocketMessage(message)
-                    messageFlow.tryEmit(sMessage)
+                    val response = json.decodeFromString<SocketMessage>(message)
+                    messageFlow.tryEmit(response)
                 }
             }
         } catch (e: Exception) {

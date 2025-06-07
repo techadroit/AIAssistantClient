@@ -1,5 +1,6 @@
 package org.dev.assistant.themes
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 
 val accentColor = Color(0xFFfaa627)
@@ -26,9 +27,24 @@ val onSurfaceColorLight = Color(0xFF000000)
 val onPrimaryLight = Color(0xFF000000)
 
 val lightGrayColor = Color(0xFF9E9E9E)
+val chatBackgroundColor = Color(0xFFF5F5F5)
+val cardBackground = Color(0xFFF3f1f3)
+val priceColor = Color(0xFF0A5147)
 
 // colors for use interest screen
 val surfaceColor = Color(0xFFFEDBD0)
 val backgroundColor = Color(0xFFFEEAE6)
 val secondaryColor = Color(0xFF442C2E)
 //F5F5F6
+
+fun ColorScheme.getChatBackgroundColor(): Color {
+    return chatBackgroundColor
+}
+
+fun ColorScheme.productCartBackground(): Color {
+    return cardBackground
+}
+
+fun ColorScheme.getPriceColor(): Color {
+    return priceColor
+}

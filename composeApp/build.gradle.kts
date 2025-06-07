@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 kotlin {
@@ -31,33 +32,13 @@ kotlin {
     }
     
     jvm("desktop")
-    
-//    @OptIn(ExperimentalWasmDsl::class)
-//    wasmJs {
-//        moduleName = "composeApp"
-//        browser {
-//            val rootDirPath = project.rootDir.path
-//            val projectDirPath = project.projectDir.path
-//            commonWebpackConfig {
-//                outputFileName = "composeApp.js"
-//                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-//                    static = (static ?: mutableListOf()).apply {
-//                        // Serve sources to debug inside browser
-//                        add(rootDirPath)
-//                        add(projectDirPath)
-//                    }
-//                }
-//            }
-//        }
-//        binaries.executable()
-//    }
-    
     sourceSets {
         val desktopMain by getting
         
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.jetbrains.ui.tooling.preview)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -76,10 +57,28 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.websockets)
+//            implementation(libs.coil.core)
+//            implementation(libs.coil.compose)
+//            implementation(libs.coil.network.ktor)
+            implementation(libs.jetbrains.ui.tooling.preview)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.ktor.client.java)
+            implementation(libs.jetbrains.ui.tooling.preview)
+
+//            implementation(libs.coil.compose)
+//            implementation(compose.desktop.common)
+        }
+
+
+    }
+    jvmToolchain(17)
+    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
+        binaries.all {
+            // Enable debug symbols
+            freeCompilerArgs += "-Xdebug-symbols"
         }
     }
 }
