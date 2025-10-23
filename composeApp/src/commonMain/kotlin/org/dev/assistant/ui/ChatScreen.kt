@@ -357,10 +357,12 @@ fun PreviewChatMessage() {
         price = 19.99
     )
     val receiveMessage = ReceiveMessage(
-        msg = "Here are some products:"
+        msg = "Here are some products:",
+        id = ""
     )
     val sentMessage = SentMessage(
-        msg = "Thank you!"
+        msg = "Thank you!",
+        id = ""
     )
     Column {
         ChatMessage(message = receiveMessage)

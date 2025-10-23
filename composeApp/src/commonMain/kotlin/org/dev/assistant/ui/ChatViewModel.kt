@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.dev.assistant.data.WebSocketClient
+import org.dev.assistant.ui.pojo.ChatMessages
 import org.dev.assistant.ui.pojo.Message
-import org.dev.assistant.ui.pojo.ReceiveMessage
 import org.dev.assistant.ui.pojo.SentMessage
 import org.dev.assistant.util.MessageParser
 
@@ -31,27 +31,44 @@ class ChatViewModel : ViewModel() {
             websocketClient.messageFlow
                 .collect { socketMessage ->
                     println("Collected from flow: ${socketMessage}")
-                    _messages.value += MessageParser.parseMessage(socketMessage)
+//                    val message = MessageParser.parseMessage(socketMessage)
+//                    _messages.value += message
+                    processMessage(socketMessage)
                 }
         } catch (e: Exception) {
             println("Error collecting messages: ${e.message}")
         }
     }
 
+    fun processMessage(chatMessages: ChatMessages) {
+        val message = MessageParser.parseMessage(chatMessages)
+        val count = _messages.value.count { it.id == message.id }
+        if (count == 0) {
+            _messages.value += message
+        } else {
+            _messages.value = _messages.value.map { existingMessage ->
+                if (existingMessage.id == message.id){
+                    val newMessage = message.copy(msg = existingMessage.msg + message.msg)
+                    newMessage
+                } else existingMessage
+            }
+        }
+    }
+
     fun sendMessage(content: String) {
         viewModelScope.launch {
-            _messages.value += SentMessage(msg = content)
+            _messages.value += SentMessage(msg = content, id = "")
             websocketClient.sendMessage(content)
         }
     }
 
-    fun refresh(){
+    fun refresh() {
         disconnect()
         clearChatHistory()
         connect()
     }
 
-    fun clearChatHistory(){
+    fun clearChatHistory() {
         _messages.value = emptyList()
     }
 
