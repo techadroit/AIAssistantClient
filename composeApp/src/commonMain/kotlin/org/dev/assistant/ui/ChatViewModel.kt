@@ -30,7 +30,7 @@ class ChatViewModel : ViewModel() {
         try {
             websocketClient.messageFlow
                 .collect { socketMessage ->
-                    println("Collected from flow: ${socketMessage.content}")
+                    println("Collected from flow: ${socketMessage}")
                     _messages.value += MessageParser.parseMessage(socketMessage)
                 }
         } catch (e: Exception) {

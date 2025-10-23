@@ -345,35 +345,6 @@ fun ChatMessage(message: Message, modifier: Modifier = Modifier) {
         ) {
             CommonText(message.msg)
             Divider8()
-            when (message) {
-                is ReceiveMessage -> {
-                    LazyRow {
-                        items(message.products) { product ->
-                            Card(
-                                backgroundColor = MaterialTheme.colorScheme.productCartBackground(),
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Column {
-                                    UrlImage(product.imageUrl)
-                                    PaddingBox {
-                                        CommonText(product.name)
-                                    }
-                                    PaddingBox {
-                                        CommonTextBold(
-                                            product.price.toString() + " $",
-                                            color = MaterialTheme.colorScheme.getPriceColor(),
-                                            fontSize = 21.sp
-                                        )
-                                    }
-                                }
-                                Divider16()
-                            }
-                        }
-                    }
-                }
-
-                is SentMessage -> {}
-            }
         }
     }
 }
@@ -386,12 +357,7 @@ fun PreviewChatMessage() {
         price = 19.99
     )
     val receiveMessage = ReceiveMessage(
-        msg = "Here are some products:",
-        products = listOf(
-            sampleProduct,
-            sampleProduct.copy(name = "Another Product", price = 29.99)
-        ),
-        messageType = "product"
+        msg = "Here are some products:"
     )
     val sentMessage = SentMessage(
         msg = "Thank you!"

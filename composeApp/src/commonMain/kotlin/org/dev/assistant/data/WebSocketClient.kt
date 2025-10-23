@@ -23,12 +23,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import org.dev.assistant.platform.getUrlProvider
+import org.dev.assistant.ui.pojo.ChatMessages
 
 //data class SocketMessage(val content: String)
 
 class WebSocketClient {
     private val json = Json { ignoreUnknownKeys = true }
-    var url = getUrlProvider().wsUrl
+    var url = getUrlProvider().wsUrl+"/12345"
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val client = HttpClient(CIO) {
         install(WebSockets) {
@@ -36,7 +37,7 @@ class WebSocketClient {
         }
     }
 
-    val messageFlow = MutableSharedFlow<SocketMessage>(
+    val messageFlow = MutableSharedFlow<ChatMessages>(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
         extraBufferCapacity = 1
@@ -47,8 +48,10 @@ class WebSocketClient {
 
     fun connect() {
         scope.launch {
+
             withContext(Dispatchers.IO) {
                 try {
+                    println(" Connecting to $url")
                     tryConnect(url)
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -112,7 +115,7 @@ class WebSocketClient {
                 if (frame is Frame.Text) {
                     val message = frame.readText()
                     println("Received message: $message")
-                    val response = json.decodeFromString<SocketMessage>(message)
+                    val response = json.decodeFromString<ChatMessages>(message)
                     messageFlow.tryEmit(response)
                 }
             }

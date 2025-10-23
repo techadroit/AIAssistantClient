@@ -1,6 +1,7 @@
 package org.dev.assistant.util
 
 import org.dev.assistant.data.SocketMessage
+import org.dev.assistant.ui.pojo.ChatMessages
 import org.dev.assistant.ui.pojo.ReceiveMessage
 
 object MessageParser {
@@ -11,8 +12,16 @@ object MessageParser {
 
         return ReceiveMessage(
             msg = message.responseMessage ?: "",
-            products = message.content.products,
-            messageType = "text"
+        )
+    }
+
+    fun parseMessage(message: ChatMessages): ReceiveMessage {
+
+        println(" the message is $message")
+
+        return ReceiveMessage(
+            msg = message.message.messages
+
         )
     }
 }
