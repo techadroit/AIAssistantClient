@@ -16,13 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Send
@@ -45,6 +44,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,22 +58,42 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import org.dev.assistant.data.Product
 import org.dev.assistant.themes.getChatBackgroundColor
-import org.dev.assistant.themes.getPriceColor
-import org.dev.assistant.themes.productCartBackground
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.ReceiveMessage
 import org.dev.assistant.ui.pojo.SentMessage
-import org.dev.assistant.util.UrlImage
+import org.dev.assistant.util.UploadState
 import org.dev.assistant.util.edgeShadow
+import org.dev.assistant.util.getFilePicker
 
+// String Constants
+const val CHAT = "chat"
+const val ADD_URL = "Add URL"
+const val ENTER_WEBSOCKET_URL = "Enter WebSocket URL"
+const val URL_LABEL = "URL"
+const val OK_BUTTON = "OK"
+const val CANCEL_BUTTON = "Cancel"
+const val REFRESH_CONTENT_DESC = "Refresh"
+const val SETTINGS_CONTENT_DESC = "Settings"
+const val SEND_CONTENT_DESC = "Send"
+const val ATTACH_FILE_CONTENT_DESC = "Attach file"
+const val ENTER_TEXT_PLACEHOLDER = "Enter text"
+const val UPLOADING_TEXT = "Uploading... "
+const val UPLOADED_FILE_PREFIX = "📎 Uploaded file: "
+const val SAMPLE_PRODUCT_NAME = "Sample Product"
+const val SAMPLE_PRODUCTS_MESSAGE = "Here are some products:"
+const val THANK_YOU_MESSAGE = "Thank you!"
+const val SELECTED_FILE_LOG = "Selected file: "
+const val SIZE_BYTES_SUFFIX = " bytes, Type: "
 
 @Composable
 fun ChatScreen() {
     val viewmodel = ChatViewModel()
     val state = viewmodel.messages.collectAsState()
     val isConnected = viewmodel.isConnected.collectAsState()
+    val uploadState = viewmodel.uploadState.collectAsState()
 
     Surface {
         Column {
@@ -91,12 +111,17 @@ fun ChatScreen() {
                     viewmodel.refresh()
                 }
             )
-            ChatContainer(state.value) {
+            ChatContainer(
+                viewModel = viewmodel,
+                messages = state.value,
+                uploadState = uploadState.value
+            ) {
                 viewmodel.sendMessage(it)
             }
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -117,7 +142,7 @@ fun ChatToolbar(
     }
 
     TopAppBar(
-        title = { Text("Chat") },
+        title = { Text(CHAT) },
         actions = {
             ConnectionSwitch(
                 isConnected = isConnected,
@@ -126,16 +151,16 @@ fun ChatToolbar(
                 } // Read-only switch
             )
             IconButton(onClick = { onRefresh() }) {
-                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                Icon(Icons.Default.Refresh, contentDescription = REFRESH_CONTENT_DESC)
             }
             IconButton(onClick = { expanded = true }) {
-                Icon(Icons.Default.MoreVert, contentDescription = "Settings")
+                Icon(Icons.Default.MoreVert, contentDescription = SETTINGS_CONTENT_DESC)
             }
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                DropdownMenuItem(text = { Text("Add URL") }, onClick = {
+                DropdownMenuItem(text = { Text(ADD_URL) }, onClick = {
                     expanded = false
                     showDialog = true
 //                    onSettingsClick()
@@ -150,12 +175,12 @@ fun ChatToolbar(
             onDismissRequest = {
                 hideDialog()
             },
-            title = { Text("Enter WebSocket URL") },
+            title = { Text(ENTER_WEBSOCKET_URL) },
             text = {
                 TextField(
                     value = url,
                     onValueChange = { url = it },
-                    label = { Text("URL") }
+                    label = { Text(URL_LABEL) }
                 )
             },
             confirmButton = {
@@ -163,14 +188,14 @@ fun ChatToolbar(
                     onUrlChange(url)
                     hideDialog()
                 }) {
-                    Text("OK")
+                    Text(OK_BUTTON)
                 }
             },
             dismissButton = {
                 Button(onClick = {
                     hideDialog()
                 }) {
-                    Text("Cancel")
+                    Text(CANCEL_BUTTON)
                 }
             }
         )
@@ -178,15 +203,38 @@ fun ChatToolbar(
 }
 
 @Composable
-fun ChatContainer(list: List<Message>, send: (String) -> Unit) {
+fun ChatContainer(
+    viewModel: ChatViewModel,
+    messages: List<Message>,
+    uploadState: UploadState,
+    send: (String) -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         ChatList(
-            messages = list,
+            messages = messages,
             modifier = Modifier.weight(1f)
         )
+
+        // Show upload progress indicator if uploading
+        if (uploadState is UploadState.Uploading) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "$UPLOADING_TEXT${(uploadState.progress * 100).toInt()}%",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+
         ChatFooter(
+            viewModel = viewModel,
             modifier = Modifier.wrapContentHeight()
         ) {
             if (it.isNotBlank() || it.isNotEmpty())
@@ -196,8 +244,10 @@ fun ChatContainer(list: List<Message>, send: (String) -> Unit) {
 }
 
 @Composable
-fun ChatFooter(modifier: Modifier = Modifier, send: (String) -> Unit) {
+fun ChatFooter(viewModel: ChatViewModel, modifier: Modifier = Modifier, send: (String) -> Unit) {
     var text by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val filePicker = getFilePicker()
 
     fun resetText() {
         text = ""
@@ -213,6 +263,16 @@ fun ChatFooter(modifier: Modifier = Modifier, send: (String) -> Unit) {
             onSend = {
                 send(text)
                 resetText()
+            },
+            onAttachClick = {
+                scope.launch {
+                    val file = filePicker.pickFile()
+                    if (file != null) {
+                        println("$SELECTED_FILE_LOG${file.name}, Size: ${file.size}$SIZE_BYTES_SUFFIX${file.mimeType}")
+                        // Upload file using viewModel
+                        viewModel.uploadFile(file, filePicker)
+                    }
+                }
             }
         ) {
             text = it
@@ -232,7 +292,7 @@ fun ChatSubmitButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
         onClick = { onClick() },
         modifier = modifier.size(48.dp)
     ) {
-        Icon(Icons.Filled.Send, contentDescription = "Send")
+        Icon(Icons.Filled.Send, contentDescription = SEND_CONTENT_DESC)
     }
 }
 
@@ -243,6 +303,7 @@ fun ChatInput(
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
     text: String,
     onSend: () -> Unit = {},
+    onAttachClick: () -> Unit = {},
     onTextChange: (String) -> Unit,
 ) {
     var isFocused by remember { mutableStateOf(false) }
@@ -255,37 +316,57 @@ fun ChatInput(
             .fillMaxWidth()
             .defaultMinSize(minHeight = OutlinedTextFieldDefaults.MinHeight)
     ) {
-        Box {
-            if (text.isEmpty() && !isFocused) {
-                Text(
-                    "Enter text",
-                    color = Color.Gray,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 16.dp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        ) {
+            // Attach button
+            IconButton(
+                onClick = onAttachClick,
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = ATTACH_FILE_CONTENT_DESC,
+                    tint = Color.Gray
                 )
             }
-            BasicTextField(
-                value = text,
-                onValueChange = onTextChange,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .matchParentSize()
-                    .onPreviewKeyEvent { keyEvent ->
-                        if (keyEvent.type == androidx.compose.ui.input.key.KeyEventType.KeyDown &&
-                            (keyEvent.key == androidx.compose.ui.input.key.Key.Enter ||
-                                    keyEvent.key == androidx.compose.ui.input.key.Key.NumPadEnter)
-                        ) {
-                            onSend()
-                            true
-                        } else {
-                            false
+
+            // Text input
+            Box(
+                modifier = Modifier.weight(1f)
+            ) {
+                if (text.isEmpty() && !isFocused) {
+                    Text(
+                        ENTER_TEXT_PLACEHOLDER,
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(start = 8.dp)
+                    )
+                }
+                BasicTextField(
+                    value = text,
+                    onValueChange = onTextChange,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                        .onPreviewKeyEvent { keyEvent ->
+                            if (keyEvent.type == androidx.compose.ui.input.key.KeyEventType.KeyDown &&
+                                (keyEvent.key == androidx.compose.ui.input.key.Key.Enter ||
+                                        keyEvent.key == androidx.compose.ui.input.key.Key.NumPadEnter)
+                            ) {
+                                onSend()
+                                true
+                            } else {
+                                false
+                            }
                         }
-                    }
-                    .onFocusChanged { focusState ->
-                        isFocused = focusState.isFocused
-                    }
-            )
+                        .onFocusChanged { focusState ->
+                            isFocused = focusState.isFocused
+                        }
+                )
+            }
         }
     }
 }
@@ -353,15 +434,15 @@ fun ChatMessage(message: Message, modifier: Modifier = Modifier) {
 fun PreviewChatMessage() {
     val sampleProduct = Product(
         imageUrl = "https://via.placeholder.com/150",
-        name = "Sample Product",
+        name = SAMPLE_PRODUCT_NAME,
         price = 19.99
     )
     val receiveMessage = ReceiveMessage(
-        msg = "Here are some products:",
+        msg = SAMPLE_PRODUCTS_MESSAGE,
         id = ""
     )
     val sentMessage = SentMessage(
-        msg = "Thank you!",
+        msg = THANK_YOU_MESSAGE,
         id = ""
     )
     Column {
