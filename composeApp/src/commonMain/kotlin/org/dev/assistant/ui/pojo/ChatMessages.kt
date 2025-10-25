@@ -3,15 +3,20 @@ package org.dev.assistant.ui.pojo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
+
 @Serializable
 data class ChatMessageBody(
     val messages: String
 )
 
 @Serializable
-data class ChatModel(
-    val mode: String
+data class AgentMode(
+    val mode: Int = 0
 )
+
+fun AgentMode.on() = copy(mode = 1)
+fun AgentMode.off() = copy(mode = 0)
 
 @Serializable
 data class ChatMessages(
@@ -20,5 +25,5 @@ data class ChatMessages(
     val sender: String,
     val receiver: String,
     val message: ChatMessageBody,
-    val mode: ChatModel
+    val mode: AgentMode = AgentMode()
 )

@@ -35,6 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
@@ -87,6 +88,7 @@ const val SAMPLE_PRODUCTS_MESSAGE = "Here are some products:"
 const val THANK_YOU_MESSAGE = "Thank you!"
 const val SELECTED_FILE_LOG = "Selected file: "
 const val SIZE_BYTES_SUFFIX = " bytes, Type: "
+const val AGENT_MODE_LABEL = "Agent Mode"
 
 @Composable
 fun ChatScreen() {
@@ -492,3 +494,25 @@ fun PaddingBox(content: @Composable () -> Unit) {
     }
 }
 
+@Composable
+fun AgentMode(
+    isAgentMode: Boolean,
+    onAgentModeChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = AGENT_MODE_LABEL,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(end = 8.dp)
+        )
+        Switch(
+            checked = isAgentMode,
+            onCheckedChange = onAgentModeChange
+        )
+    }
+}
