@@ -9,10 +9,10 @@ import org.dev.assistant.data.WebSocketClient
 import org.dev.assistant.ui.pojo.ChatMessages
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.SentMessage
-import org.dev.assistant.util.MessageParser
 import org.dev.assistant.util.FileData
 import org.dev.assistant.util.FilePicker
 import org.dev.assistant.util.FileUploadService
+import org.dev.assistant.util.MessageParser
 import org.dev.assistant.util.UploadState
 
 
@@ -29,6 +29,10 @@ class ChatViewModel : ViewModel() {
     // Upload state
     private val _uploadState = MutableStateFlow<UploadState>(UploadState.Idle)
     val uploadState: StateFlow<UploadState> = _uploadState
+
+    // Agent mode state
+    private val _isAgentMode = MutableStateFlow(false)
+    val isAgentMode: StateFlow<Boolean> = _isAgentMode
 
     // Base URL for your FastAPI server
     private var apiBaseUrl = "http://localhost:8001/api" // Update this with your server URL
@@ -58,7 +62,7 @@ class ChatViewModel : ViewModel() {
             _messages.value += message
         } else {
             _messages.value = _messages.value.map { existingMessage ->
-                if (existingMessage.id == message.id){
+                if (existingMessage.id == message.id) {
                     val newMessage = message.copy(msg = existingMessage.msg + message.msg)
                     newMessage
                 } else existingMessage
@@ -68,9 +72,21 @@ class ChatViewModel : ViewModel() {
 
     fun sendMessage(content: String) {
         viewModelScope.launch {
-            _messages.value += SentMessage(msg = content, id = "")
-            websocketClient.sendMessage(content)
+            val message = SentMessage(
+                msg = content,
+                id = "",
+                agentMode = org.dev.assistant.ui.pojo.ChatMode(mode = if (_isAgentMode.value) 1 else 0)
+            )
+            _messages.value += message
+            websocketClient.sendMessage(message.toString())
         }
+    }
+
+    /**
+     * Toggle agent mode on/off
+     */
+    fun setAgentMode(enabled: Boolean) {
+        _isAgentMode.value = enabled
     }
 
     fun refresh() {

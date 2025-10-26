@@ -11,12 +11,12 @@ data class ChatMessageBody(
 )
 
 @Serializable
-data class AgentMode(
+data class ChatMode(
     val mode: Int = 0
 )
 
-fun AgentMode.on() = copy(mode = 1)
-fun AgentMode.off() = copy(mode = 0)
+fun ChatMode.on() = copy(mode = 1)
+fun ChatMode.off() = copy(mode = 0)
 
 @Serializable
 data class ChatMessages(
@@ -25,5 +25,5 @@ data class ChatMessages(
     val sender: String,
     val receiver: String,
     val message: ChatMessageBody,
-    val mode: AgentMode = AgentMode()
+    val chat_mode: ChatMode = ChatMode()
 )

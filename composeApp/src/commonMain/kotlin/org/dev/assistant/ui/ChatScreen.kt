@@ -96,6 +96,7 @@ fun ChatScreen() {
     val state = viewmodel.messages.collectAsState()
     val isConnected = viewmodel.isConnected.collectAsState()
     val uploadState = viewmodel.uploadState.collectAsState()
+    val isAgentMode = viewmodel.isAgentMode.collectAsState()
 
     Surface {
         Column {
@@ -116,7 +117,8 @@ fun ChatScreen() {
             ChatContainer(
                 viewModel = viewmodel,
                 messages = state.value,
-                uploadState = uploadState.value
+                uploadState = uploadState.value,
+                isAgentMode = isAgentMode.value
             ) {
                 viewmodel.sendMessage(it)
             }
@@ -209,6 +211,7 @@ fun ChatContainer(
     viewModel: ChatViewModel,
     messages: List<Message>,
     uploadState: UploadState,
+    isAgentMode: Boolean,
     send: (String) -> Unit
 ) {
     Column(
@@ -234,6 +237,13 @@ fun ChatContainer(
                 )
             }
         }
+
+        // Agent Mode toggle above chat footer
+        AgentMode(
+            isAgentMode = isAgentMode,
+            onAgentModeChange = { viewModel.setAgentMode(it) },
+            modifier = Modifier.fillMaxWidth()
+        )
 
         ChatFooter(
             viewModel = viewModel,
