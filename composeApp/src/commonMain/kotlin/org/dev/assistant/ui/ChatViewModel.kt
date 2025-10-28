@@ -78,7 +78,7 @@ class ChatViewModel : ViewModel() {
                 agentMode = org.dev.assistant.ui.pojo.ChatMode(mode = if (_isAgentMode.value) 1 else 0)
             )
             _messages.value += message
-            websocketClient.sendMessage(message.toString())
+            websocketClient.sendMessage(MessageParser.toChatMessage(message))
         }
     }
 
