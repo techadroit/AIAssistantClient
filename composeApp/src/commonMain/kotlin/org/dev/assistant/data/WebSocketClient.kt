@@ -5,6 +5,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.http.encodeURLParameter
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
@@ -89,6 +90,7 @@ class WebSocketClient {
 
     suspend fun sendMessage(content: String) {
         try {
+            // URL encode the content (useful for JSON strings)
             val sendingText = Frame.Text(content)
             println(" sending message $content")
             session?.send(sendingText)

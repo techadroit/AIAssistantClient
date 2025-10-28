@@ -1,10 +1,19 @@
 package org.dev.assistant.util
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.dev.assistant.ui.pojo.ChatMessages
 import org.dev.assistant.ui.pojo.ReceiveMessage
 import org.dev.assistant.ui.pojo.SentMessage
 
 object MessageParser {
+
+    // JSON instance for serialization
+    private val json = Json {
+        ignoreUnknownKeys = true
+        prettyPrint = false
+        isLenient = true
+    }
 
 //    fun parseMessage(message: SocketMessage): ReceiveMessage {
 //
@@ -26,8 +35,8 @@ object MessageParser {
         )
     }
 
-    fun toChatMessage(message: SentMessage): ChatMessages{
-        return ChatMessages(
+    fun toChatMessage(message: SentMessage): String {
+        val chatMessages = ChatMessages(
             messageId = message.id,
             utcTime = "",
             sender = "user",
@@ -35,5 +44,6 @@ object MessageParser {
             message = org.dev.assistant.ui.pojo.ChatMessageBody(messages = message.msg),
             chat_mode = message.agentMode
         )
+        return json.encodeToString(chatMessages)
     }
 }
