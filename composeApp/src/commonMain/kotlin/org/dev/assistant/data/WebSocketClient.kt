@@ -29,8 +29,10 @@ import org.dev.assistant.ui.pojo.ChatMessages
 //data class SocketMessage(val content: String)
 
 class WebSocketClient {
+
+    private val sessionManager = SessionManager()
     private val json = Json { ignoreUnknownKeys = true }
-    var url = getUrlProvider().wsUrl+"/12345"
+    var url = getUrlProvider().wsUrl+"/"+sessionManager.getSessionId()
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val client = HttpClient(CIO) {
         install(WebSockets) {

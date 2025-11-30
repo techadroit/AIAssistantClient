@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.dev.assistant.data.SessionManager
 import org.dev.assistant.data.WebSocketClient
 import org.dev.assistant.ui.pojo.ChatMessages
 import org.dev.assistant.ui.pojo.Message
@@ -18,6 +19,7 @@ import org.dev.assistant.util.UploadState
 
 class ChatViewModel : ViewModel() {
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
+    private val sessionManager = SessionManager()
     val messages: StateFlow<List<Message>> = _messages
     val websocketClient = WebSocketClient()
     private val _isConnected = MutableStateFlow(false)
@@ -145,6 +147,7 @@ class ChatViewModel : ViewModel() {
 
                 // Use FileUploadService with progress callback
                 fileUploadService.uploadFileWithProgress(
+                    sessionId = sessionManager.getSessionId(),
                     fileData = fileData,
                     endpoint = endpoint,
                     filePicker = filePicker,
