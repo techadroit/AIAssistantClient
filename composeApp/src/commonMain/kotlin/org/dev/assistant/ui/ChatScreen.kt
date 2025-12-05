@@ -210,15 +210,9 @@ fun ChatContainer(
             }
         }
 
-        // Chat Mode Dropdown
-        ChatModeDropdown(
-            selectedMode = chatMode,
-            onModeSelected = { viewModel.setChatMode(it) },
-            modifier = Modifier.fillMaxWidth()
-        )
-
         ChatFooter(
             viewModel = viewModel,
+            chatMode = chatMode,
             modifier = Modifier.wrapContentHeight()
         ) {
             if (it.isNotBlank() || it.isNotEmpty())
@@ -228,7 +222,12 @@ fun ChatContainer(
 }
 
 @Composable
-fun ChatFooter(viewModel: ChatViewModel, modifier: Modifier = Modifier, send: (String) -> Unit) {
+fun ChatFooter(
+    viewModel: ChatViewModel,
+    chatMode: ChatModeType,
+    modifier: Modifier = Modifier,
+    send: (String) -> Unit
+) {
     var text by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     val filePicker = getFilePicker()
@@ -237,35 +236,45 @@ fun ChatFooter(viewModel: ChatViewModel, modifier: Modifier = Modifier, send: (S
         text = ""
     }
 
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        ChatInput(
-            modifier = Modifier.weight(1f),
-            text = text,
-            onSend = {
-                send(text)
-                resetText()
-            },
-            onAttachClick = {
-                scope.launch {
-                    val file = filePicker.pickFile()
-                    if (file != null) {
-                        println("$SELECTED_FILE_LOG${file.name}, Size: ${file.size}$SIZE_BYTES_SUFFIX${file.mimeType}")
-                        // Upload file using viewModel
-                        viewModel.uploadFile(file, filePicker)
+    Column(modifier = modifier.fillMaxWidth()) {
+        // Chat Mode Dropdown
+
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ChatInput(
+                modifier = Modifier.weight(1f),
+                text = text,
+                onSend = {
+                    send(text)
+                    resetText()
+                },
+                onAttachClick = {
+                    scope.launch {
+                        val file = filePicker.pickFile()
+                        if (file != null) {
+                            println("$SELECTED_FILE_LOG${file.name}, Size: ${file.size}$SIZE_BYTES_SUFFIX${file.mimeType}")
+                            // Upload file using viewModel
+                            viewModel.uploadFile(file, filePicker)
+                        }
                     }
                 }
+            ) {
+                text = it
             }
-        ) {
-            text = it
-        }
-        ChatSubmitButton(
-            modifier = Modifier.padding(end = 16.dp)
-        ) {
-            send(text)
-            resetText()
+            ChatModeDropdown(
+                selectedMode = chatMode,
+                onModeSelected = { viewModel.setChatMode(it) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            ChatSubmitButton(
+                modifier = Modifier.padding(end = 16.dp)
+            ) {
+                send(text)
+                resetText()
+            }
         }
     }
 }
@@ -485,60 +494,54 @@ fun ChatModeDropdown(
     var expanded by remember { mutableStateOf(false) }
     val options = remember { ChatModeType.values() }
 
-    Column(
-        modifier = modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-//        Text(
-//            text = CHAT_MODE_LABEL,
-//            style = MaterialTheme.typography.bodySmall,
-//            modifier = Modifier.padding(bottom = 4.dp)
-//        )
-        Surface(
-            shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(1.dp, Color.Gray),
+//    Surface(
+//        shape = RoundedCornerShape(8.dp),
+//        border = BorderStroke(1.dp, Color.Gray),
+//        modifier = modifier
+//            .wrapContentWidth()
+//            .padding(horizontal = 16.dp, vertical = 8.dp)
+//            .defaultMinSize(minHeight = 40.dp)
+//            .background(Color.Transparent)
+//    ) {
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .defaultMinSize(minHeight = 48.dp)
+                .wrapContentWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp)
                 .background(Color.Transparent)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 12.dp)
-                    .background(Color.Transparent)
+            Row(
+
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(selectedMode.value.ifBlank { SELECT_CHAT_MODE }, style = MaterialTheme.typography.bodySmall)
-                    IconButton(onClick = { expanded = !expanded }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = null)
-                    }
+                Text(
+                    selectedMode.value.ifBlank { SELECT_CHAT_MODE },
+                    style = MaterialTheme.typography.bodySmall
+                )
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(Icons.Default.MoreVert, contentDescription = null)
                 }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    options.forEach { mode ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = mode.value,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier.padding(bottom = 4.dp)
-                                )
-                            },
-                            onClick = {
-                                onModeSelected(mode)
-                                expanded = false
-                            }
-                        )
-                    }
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.forEach { mode ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = mode.value,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                        },
+                        onClick = {
+                            onModeSelected(mode)
+                            expanded = false
+                        }
+                    )
                 }
             }
         }
-    }
+//    }
 }
