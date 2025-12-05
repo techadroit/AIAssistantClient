@@ -8,6 +8,8 @@ import kotlinx.coroutines.launch
 import org.dev.assistant.data.SessionManager
 import org.dev.assistant.data.WebSocketClient
 import org.dev.assistant.ui.pojo.ChatMessages
+import org.dev.assistant.ui.pojo.ChatMode
+import org.dev.assistant.ui.pojo.ChatModeType
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.SentMessage
 import org.dev.assistant.util.FileData
@@ -33,8 +35,8 @@ class ChatViewModel : ViewModel() {
     val uploadState: StateFlow<UploadState> = _uploadState
 
     // Agent mode state
-    private val _isAgentMode = MutableStateFlow(false)
-    val isAgentMode: StateFlow<Boolean> = _isAgentMode
+    private val _chatMode = MutableStateFlow(ChatModeType.NONE)
+    val chatMode: StateFlow<ChatModeType> = _chatMode
 
     // Base URL for your FastAPI server
     private var apiBaseUrl = "http://localhost:8001/api" // Update this with your server URL
@@ -77,7 +79,7 @@ class ChatViewModel : ViewModel() {
             val message = SentMessage(
                 msg = content,
                 id = "",
-                agentMode = org.dev.assistant.ui.pojo.ChatMode(mode = if (_isAgentMode.value) 1 else 0)
+                agentMode = ChatMode(mode = _chatMode.value)
             )
             _messages.value += message
             websocketClient.sendMessage(MessageParser.toChatMessage(message))
@@ -87,8 +89,8 @@ class ChatViewModel : ViewModel() {
     /**
      * Toggle agent mode on/off
      */
-    fun setAgentMode(enabled: Boolean) {
-        _isAgentMode.value = enabled
+    fun setChatMode(mode: ChatModeType) {
+        _chatMode.value = mode
     }
 
     fun refresh() {

@@ -3,20 +3,30 @@ package org.dev.assistant.ui.pojo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
-
 @Serializable
 data class ChatMessageBody(
     val messages: String
 )
 
 @Serializable
+enum class ChatModeType(val value: String) {
+    @SerialName("document")
+    DOCUMENT("document"),
+    @SerialName("websearch")
+    WEBSEARCH("websearch"),
+    @SerialName("agent")
+    AGENT("agent"),
+    @SerialName("none")
+    NONE("none")
+}
+
+@Serializable
 data class ChatMode(
-    val mode: Int = 0
+    val mode: ChatModeType = ChatModeType.NONE
 )
 
-fun ChatMode.on() = copy(mode = 1)
-fun ChatMode.off() = copy(mode = 0)
+fun ChatMode.on() = copy(mode = ChatModeType.AGENT)
+fun ChatMode.off() = copy(mode = ChatModeType.NONE)
 
 @Serializable
 data class ChatMessages(

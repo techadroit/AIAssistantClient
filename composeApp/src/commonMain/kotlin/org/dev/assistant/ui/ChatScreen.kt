@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.dev.assistant.data.Product
 import org.dev.assistant.themes.getChatBackgroundColor
+import org.dev.assistant.ui.pojo.ChatModeType
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.ReceiveMessage
 import org.dev.assistant.ui.pojo.SentMessage
@@ -89,6 +90,8 @@ const val THANK_YOU_MESSAGE = "Thank you!"
 const val SELECTED_FILE_LOG = "Selected file: "
 const val SIZE_BYTES_SUFFIX = " bytes, Type: "
 const val AGENT_MODE_LABEL = "Agent Mode"
+const val CHAT_MODE_LABEL = "Chat Mode"
+const val SELECT_CHAT_MODE = "Select mode"
 
 @Composable
 fun ChatScreen() {
@@ -96,7 +99,7 @@ fun ChatScreen() {
     val state = viewmodel.messages.collectAsState()
     val isConnected = viewmodel.isConnected.collectAsState()
     val uploadState = viewmodel.uploadState.collectAsState()
-    val isAgentMode = viewmodel.isAgentMode.collectAsState()
+    val chatMode = viewmodel.chatMode.collectAsState()
 
     Surface {
         Column {
@@ -118,7 +121,7 @@ fun ChatScreen() {
                 viewModel = viewmodel,
                 messages = state.value,
                 uploadState = uploadState.value,
-                isAgentMode = isAgentMode.value
+                chatMode = chatMode.value
             ) {
                 viewmodel.sendMessage(it)
             }
@@ -211,7 +214,7 @@ fun ChatContainer(
     viewModel: ChatViewModel,
     messages: List<Message>,
     uploadState: UploadState,
-    isAgentMode: Boolean,
+    chatMode: ChatModeType,
     send: (String) -> Unit
 ) {
     Column(
@@ -238,10 +241,10 @@ fun ChatContainer(
             }
         }
 
-        // Agent Mode toggle above chat footer
-        AgentMode(
-            isAgentMode = isAgentMode,
-            onAgentModeChange = { viewModel.setAgentMode(it) },
+        // Chat Mode Dropdown
+        ChatModeDropdown(
+            selectedMode = chatMode,
+            onModeSelected = { viewModel.setChatMode(it) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -505,24 +508,62 @@ fun PaddingBox(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun AgentMode(
-    isAgentMode: Boolean,
-    onAgentModeChange: (Boolean) -> Unit,
+fun ChatModeDropdown(
+    selectedMode: ChatModeType,
+    onModeSelected: (ChatModeType) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+    var expanded by remember { mutableStateOf(false) }
+    val options = remember { ChatModeType.values() }
+
+    Column(
+        modifier = modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
-            text = AGENT_MODE_LABEL,
+            text = CHAT_MODE_LABEL,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(end = 8.dp)
+            modifier = Modifier.padding(bottom = 4.dp)
         )
-        Switch(
-            checked = isAgentMode,
-            onCheckedChange = onAgentModeChange
-        )
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, Color.Gray),
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 48.dp)
+                .background(Color.Transparent)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 12.dp)
+                    .background(Color.Transparent)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(selectedMode.value.ifBlank { SELECT_CHAT_MODE })
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = null)
+                    }
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    options.forEach { mode ->
+                        DropdownMenuItem(
+                            text = { Text(mode.value) },
+                            onClick = {
+                                onModeSelected(mode)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
     }
 }
