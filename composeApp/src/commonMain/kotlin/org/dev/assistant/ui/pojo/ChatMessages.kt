@@ -3,6 +3,8 @@ package org.dev.assistant.ui.pojo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
+
 @Serializable
 data class ChatMessageBody(
     val messages: String
