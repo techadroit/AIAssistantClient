@@ -5,19 +5,23 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.dev.assistant.data.SessionManager
 import org.dev.assistant.data.WebSocketClient
 import org.dev.assistant.ui.pojo.ChatMessages
+import org.dev.assistant.ui.pojo.ChatMode
+import org.dev.assistant.ui.pojo.ChatModeType
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.SentMessage
-import org.dev.assistant.util.MessageParser
 import org.dev.assistant.util.FileData
 import org.dev.assistant.util.FilePicker
 import org.dev.assistant.util.FileUploadService
+import org.dev.assistant.util.MessageParser
 import org.dev.assistant.util.UploadState
 
 
 class ChatViewModel : ViewModel() {
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
+    private val sessionManager = SessionManager()
     val messages: StateFlow<List<Message>> = _messages
     val websocketClient = WebSocketClient()
     private val _isConnected = MutableStateFlow(false)
@@ -29,6 +33,10 @@ class ChatViewModel : ViewModel() {
     // Upload state
     private val _uploadState = MutableStateFlow<UploadState>(UploadState.Idle)
     val uploadState: StateFlow<UploadState> = _uploadState
+
+    // Agent mode state
+    private val _chatMode = MutableStateFlow(ChatModeType.NONE)
+    val chatMode: StateFlow<ChatModeType> = _chatMode
 
     // Base URL for your FastAPI server
     private var apiBaseUrl = "http://localhost:8001/api" // Update this with your server URL
@@ -58,7 +66,7 @@ class ChatViewModel : ViewModel() {
             _messages.value += message
         } else {
             _messages.value = _messages.value.map { existingMessage ->
-                if (existingMessage.id == message.id){
+                if (existingMessage.id == message.id) {
                     val newMessage = message.copy(msg = existingMessage.msg + message.msg)
                     newMessage
                 } else existingMessage
@@ -68,9 +76,21 @@ class ChatViewModel : ViewModel() {
 
     fun sendMessage(content: String) {
         viewModelScope.launch {
-            _messages.value += SentMessage(msg = content, id = "")
-            websocketClient.sendMessage(content)
+            val message = SentMessage(
+                msg = content,
+                id = "",
+                agentMode = ChatMode(mode = _chatMode.value)
+            )
+            _messages.value += message
+            websocketClient.sendMessage(MessageParser.toChatMessage(message))
         }
+    }
+
+    /**
+     * Toggle agent mode on/off
+     */
+    fun setChatMode(mode: ChatModeType) {
+        _chatMode.value = mode
     }
 
     fun refresh() {
@@ -129,6 +149,7 @@ class ChatViewModel : ViewModel() {
 
                 // Use FileUploadService with progress callback
                 fileUploadService.uploadFileWithProgress(
+                    sessionId = sessionManager.getSessionId(),
                     fileData = fileData,
                     endpoint = endpoint,
                     filePicker = filePicker,

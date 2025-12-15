@@ -5,6 +5,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.http.encodeURLParameter
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
@@ -28,8 +29,10 @@ import org.dev.assistant.ui.pojo.ChatMessages
 //data class SocketMessage(val content: String)
 
 class WebSocketClient {
+
+    private val sessionManager = SessionManager()
     private val json = Json { ignoreUnknownKeys = true }
-    var url = getUrlProvider().wsUrl+"/12345"
+    var url = getUrlProvider().wsUrl+"/"+sessionManager.getSessionId()
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val client = HttpClient(CIO) {
         install(WebSockets) {
@@ -89,6 +92,7 @@ class WebSocketClient {
 
     suspend fun sendMessage(content: String) {
         try {
+            // URL encode the content (useful for JSON strings)
             val sendingText = Frame.Text(content)
             println(" sending message $content")
             session?.send(sendingText)

@@ -3,18 +3,7 @@ package org.dev.assistant.ui
 //import coil3.compose.AsyncImage
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,27 +14,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -61,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.dev.assistant.data.Product
 import org.dev.assistant.themes.getChatBackgroundColor
+import org.dev.assistant.ui.pojo.ChatModeType
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.ReceiveMessage
 import org.dev.assistant.ui.pojo.SentMessage
@@ -87,6 +58,9 @@ const val SAMPLE_PRODUCTS_MESSAGE = "Here are some products:"
 const val THANK_YOU_MESSAGE = "Thank you!"
 const val SELECTED_FILE_LOG = "Selected file: "
 const val SIZE_BYTES_SUFFIX = " bytes, Type: "
+const val AGENT_MODE_LABEL = "Agent Mode"
+const val CHAT_MODE_LABEL = "Chat Mode"
+const val SELECT_CHAT_MODE = "Select mode"
 
 @Composable
 fun ChatScreen() {
@@ -94,6 +68,7 @@ fun ChatScreen() {
     val state = viewmodel.messages.collectAsState()
     val isConnected = viewmodel.isConnected.collectAsState()
     val uploadState = viewmodel.uploadState.collectAsState()
+    val chatMode = viewmodel.chatMode.collectAsState()
 
     Surface {
         Column {
@@ -114,7 +89,8 @@ fun ChatScreen() {
             ChatContainer(
                 viewModel = viewmodel,
                 messages = state.value,
-                uploadState = uploadState.value
+                uploadState = uploadState.value,
+                chatMode = chatMode.value
             ) {
                 viewmodel.sendMessage(it)
             }
@@ -207,6 +183,7 @@ fun ChatContainer(
     viewModel: ChatViewModel,
     messages: List<Message>,
     uploadState: UploadState,
+    chatMode: ChatModeType,
     send: (String) -> Unit
 ) {
     Column(
@@ -235,6 +212,7 @@ fun ChatContainer(
 
         ChatFooter(
             viewModel = viewModel,
+            chatMode = chatMode,
             modifier = Modifier.wrapContentHeight()
         ) {
             if (it.isNotBlank() || it.isNotEmpty())
@@ -244,7 +222,12 @@ fun ChatContainer(
 }
 
 @Composable
-fun ChatFooter(viewModel: ChatViewModel, modifier: Modifier = Modifier, send: (String) -> Unit) {
+fun ChatFooter(
+    viewModel: ChatViewModel,
+    chatMode: ChatModeType,
+    modifier: Modifier = Modifier,
+    send: (String) -> Unit
+) {
     var text by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     val filePicker = getFilePicker()
@@ -253,35 +236,45 @@ fun ChatFooter(viewModel: ChatViewModel, modifier: Modifier = Modifier, send: (S
         text = ""
     }
 
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        ChatInput(
-            modifier = Modifier.weight(1f),
-            text = text,
-            onSend = {
-                send(text)
-                resetText()
-            },
-            onAttachClick = {
-                scope.launch {
-                    val file = filePicker.pickFile()
-                    if (file != null) {
-                        println("$SELECTED_FILE_LOG${file.name}, Size: ${file.size}$SIZE_BYTES_SUFFIX${file.mimeType}")
-                        // Upload file using viewModel
-                        viewModel.uploadFile(file, filePicker)
+    Column(modifier = modifier.fillMaxWidth()) {
+        // Chat Mode Dropdown
+
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ChatInput(
+                modifier = Modifier.weight(1f),
+                text = text,
+                onSend = {
+                    send(text)
+                    resetText()
+                },
+                onAttachClick = {
+                    scope.launch {
+                        val file = filePicker.pickFile()
+                        if (file != null) {
+                            println("$SELECTED_FILE_LOG${file.name}, Size: ${file.size}$SIZE_BYTES_SUFFIX${file.mimeType}")
+                            // Upload file using viewModel
+                            viewModel.uploadFile(file, filePicker)
+                        }
                     }
                 }
+            ) {
+                text = it
             }
-        ) {
-            text = it
-        }
-        ChatSubmitButton(
-            modifier = Modifier.padding(end = 16.dp)
-        ) {
-            send(text)
-            resetText()
+            ChatModeDropdown(
+                selectedMode = chatMode,
+                onModeSelected = { viewModel.setChatMode(it) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            ChatSubmitButton(
+                modifier = Modifier.padding(end = 16.dp)
+            ) {
+                send(text)
+                resetText()
+            }
         }
     }
 }
@@ -492,3 +485,63 @@ fun PaddingBox(content: @Composable () -> Unit) {
     }
 }
 
+@Composable
+fun ChatModeDropdown(
+    selectedMode: ChatModeType,
+    onModeSelected: (ChatModeType) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val options = remember { ChatModeType.values() }
+
+//    Surface(
+//        shape = RoundedCornerShape(8.dp),
+//        border = BorderStroke(1.dp, Color.Gray),
+//        modifier = modifier
+//            .wrapContentWidth()
+//            .padding(horizontal = 16.dp, vertical = 8.dp)
+//            .defaultMinSize(minHeight = 40.dp)
+//            .background(Color.Transparent)
+//    ) {
+        Box(
+            modifier = Modifier
+                .wrapContentWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .background(Color.Transparent)
+        ) {
+            Row(
+
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    selectedMode.value.ifBlank { SELECT_CHAT_MODE },
+                    style = MaterialTheme.typography.bodySmall
+                )
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(Icons.Default.MoreVert, contentDescription = null)
+                }
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.forEach { mode ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = mode.value,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                        },
+                        onClick = {
+                            onModeSelected(mode)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+//    }
+}

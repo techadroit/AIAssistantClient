@@ -27,10 +27,12 @@ class FileUploadService {
                 is UploadState.Uploading -> {
                     println("Uploading ${fileData.name}: ${(state.progress * 100).toInt()}%")
                 }
+
                 is UploadState.Success -> {
                     println("Successfully uploaded ${fileData.name}")
                     println("Response: ${state.url}")
                 }
+
                 is UploadState.Error -> {
                     println("Failed to upload ${fileData.name}: ${state.message}")
                 }
@@ -43,6 +45,7 @@ class FileUploadService {
      * Used by ChatViewModel to upload files and track progress
      */
     suspend fun uploadFileWithProgress(
+        sessionId: String,
         fileData: FileData,
         endpoint: String,
         filePicker: FilePicker,
@@ -52,7 +55,7 @@ class FileUploadService {
         val preparedFile = fileUploader.prepareFileForUpload(fileData, filePicker)
 
         // Upload with progress tracking
-        fileUploader.uploadFile(preparedFile, endpoint).collect { state ->
+        fileUploader.uploadFile(preparedFile, endpoint, sessionId = sessionId).collect { state ->
             onProgress(state)
         }
     }

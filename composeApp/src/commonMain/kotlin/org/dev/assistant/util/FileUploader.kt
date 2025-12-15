@@ -35,7 +35,8 @@ class FileUploader(private val httpClient: HttpClient? = null) {
     fun uploadFile(
         fileData: FileData,
         endpoint: String,
-        authToken: String? = null
+        authToken: String? = null,
+        sessionId: String = ""
     ): Flow<UploadState> = flow {
         emit(UploadState.Idle)
 
@@ -56,9 +57,9 @@ class FileUploader(private val httpClient: HttpClient? = null) {
 //                emit(UploadState.Success("Simulated upload - no HTTP client provided"))
 //                return@flow
 //            }
-
+            val uploadUrl = "$endpoint?session_id=$sessionId"
             // Perform actual upload using Ktor
-            val response = httpClient?.post(endpoint) {
+            val response = httpClient?.post(uploadUrl) {
 //                if (authToken != null) {
 //                    header(HttpHeaders.Authorization, "Bearer $authToken")
 //                }
@@ -76,6 +77,7 @@ class FileUploader(private val httpClient: HttpClient? = null) {
                         append("filename", fileData.name)
                         append("filesize", fileData.size.toString())
                         append("mimetype", fileData.mimeType)
+                        append("session_Id", sessionId)
                     }
                 ))
 
