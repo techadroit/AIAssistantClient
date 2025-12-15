@@ -1,12 +1,13 @@
 package org.dev.assistant.ui
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.PermanentDrawerSheet
+import androidx.compose.material3.PermanentNavigationDrawer
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.dev.assistant.Res
@@ -24,17 +25,13 @@ fun SideNavigationUI(
     onNavigateToAbout: () -> Unit,
     content: @Composable () -> Unit
 ) {
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
 
-    ModalNavigationDrawer(
+    PermanentNavigationDrawer(
         drawerContent = {
-            ModalDrawerSheet {
-
+            PermanentDrawerSheet {
                 Heading(text = stringResource(Res.string.app_heading))
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    LabelItem(text = stringResource(Res.string.new_chat))
-                }
+                LabelItem(text = stringResource(Res.string.new_chat))
             }
         }
     ) {
