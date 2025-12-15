@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.dev.assistant.data.Product
-import org.dev.assistant.themes.getChatBackgroundColor
+import org.dev.assistant.design_system.themes.getChatBackgroundColor
 import org.dev.assistant.ui.pojo.ChatModeType
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.ReceiveMessage
@@ -63,7 +63,7 @@ const val CHAT_MODE_LABEL = "Chat Mode"
 const val SELECT_CHAT_MODE = "Select mode"
 
 @Composable
-fun ChatScreen() {
+fun ChatScreen(modifier: Modifier) {
     val viewmodel = ChatViewModel()
     val state = viewmodel.messages.collectAsState()
     val isConnected = viewmodel.isConnected.collectAsState()
@@ -143,7 +143,7 @@ fun ChatToolbar(
                 })
             }
         },
-        modifier = Modifier.edgeShadow()
+//        modifier = Modifier.edgeShadow()
     )
 
     if (showDialog) {

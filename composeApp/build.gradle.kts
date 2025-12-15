@@ -125,3 +125,9 @@ compose.desktop {
         }
     }
 }
+
+compose.resources {
+    publicResClass = false
+    packageOfResClass = "org.dev.assistant"
+    generateResClass = auto
+}

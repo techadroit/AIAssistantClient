@@ -1,4 +1,4 @@
-package org.dev.assistant.themes
+package org.dev.assistant.design_system.themes
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
