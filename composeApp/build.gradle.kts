@@ -32,9 +32,24 @@ kotlin {
     }
     
     jvm("desktop")
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        nodejs()
+    }
     sourceSets {
         val desktopMain by getting
-        
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
+        val desktopTest by getting {
+            dependsOn(commonTest)
+        }
+        val wasmJsTest by getting {
+            dependsOn(commonTest)
+        }
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -70,8 +85,6 @@ kotlin {
 //            implementation(libs.coil.compose)
 //            implementation(compose.desktop.common)
         }
-
-
     }
     jvmToolchain(17)
     targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
