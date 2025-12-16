@@ -2,5 +2,6 @@
 
     <string name="app_name">Personal AI</string>
     <string name="app_heading">Personal AI</string>
+    <string name="home">Home</string>
     <string name="new_chat">New Chat</string>
 </resources>

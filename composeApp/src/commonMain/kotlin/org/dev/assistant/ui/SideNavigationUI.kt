@@ -27,6 +27,7 @@ import org.dev.assistant.design_system.ui.Heading
 import org.dev.assistant.design_system.ui.LabelItem
 import org.dev.assistant.design_system.ui.SideNavigationDivider
 import org.dev.assistant.design_system.ui.SideNavigationItem
+import org.dev.assistant.home
 import org.dev.assistant.new_chat
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -34,6 +35,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun SideNavigationUI(
+    onNavigateToHome: () -> Unit,
     onNavigateToChat: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToAbout: () -> Unit,
@@ -61,6 +63,9 @@ fun SideNavigationUI(
                         }
                         Column {
                             SideNavigationDivider()
+                            SideNavigationItem(onClick = onNavigateToHome) {
+                                LabelItem(text = stringResource(Res.string.home))
+                            }
                             SideNavigationItem(onClick = onNavigateToChat) {
                                 LabelItem(text = stringResource(Res.string.new_chat))
                             }
@@ -85,5 +90,5 @@ fun SideNavigationUI(
 @Preview
 @Composable
 fun PreviewSideNavigationUI() {
-    SideNavigationUI({}, {}, {}, {})
+    SideNavigationUI({}, {}, {}, {}, {})
 }
