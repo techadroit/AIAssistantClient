@@ -22,7 +22,8 @@ fun createDimension(
     cardVerticalPadding: Dp = 8.dp,
     contentPadding: Dp = 80.dp,
     videoListGrid: GridCells = GridCells.Fixed(2),
-    elevation: Dp = 4.dp
+    elevation: Dp = 4.dp,
+    drawerMinWidth: Dp = 240.dp
 ) = Dimension(
     paddingBody = paddingBody,
     paddingTitle = paddingTitle,
@@ -35,7 +36,8 @@ fun createDimension(
     cardVerticalPadding = cardVerticalPadding,
     contentPadding = contentPadding,
     videoListGrid = videoListGrid,
-    elevation = elevation
+    elevation = elevation,
+    drawerMinWidth = drawerMinWidth
 )
 
 fun compactDimension() = createDimension()
@@ -60,7 +62,8 @@ data class Dimension(
     val contentPadding: Dp = 80.dp,
     val videoListGrid: GridCells = GridCells.Fixed(2),
     val maxContentWidth: Dp = 400.dp,
-    val elevation: Dp
+    val elevation: Dp,
+    val drawerMinWidth: Dp
 )
 
 val LocalDimensionProvider = compositionLocalOf { createDimension() }
