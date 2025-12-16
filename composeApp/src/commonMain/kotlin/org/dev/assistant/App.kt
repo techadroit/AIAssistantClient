@@ -2,6 +2,11 @@ package org.dev.assistant
 
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import org.dev.assistant.design_system.themes.HomeTheme
 import org.dev.assistant.ui.ChatScreen
@@ -16,11 +21,22 @@ fun App() {
 
 @Composable
 fun MainApp() {
+    var chatKey by remember { mutableStateOf(0) }
+
     HomeTheme {
         Scaffold { padding ->
-            SideNavigationUI({}, {}, {}, {
-                ChatScreen(modifier = Modifier)
-            })
+            SideNavigationUI(
+                onNavigateToChat = {
+                    // Increment key to create a new chat instance
+                    chatKey++
+                },
+                onNavigateToSettings = {},
+                onNavigateToAbout = {}
+            ) {
+                key(chatKey) {
+                    ChatScreen(modifier = Modifier)
+                }
+            }
         }
     }
 }

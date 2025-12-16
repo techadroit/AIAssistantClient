@@ -61,7 +61,7 @@ fun SideNavigationUI(
                         }
                         Column {
                             SideNavigationDivider()
-                            SideNavigationItem {
+                            SideNavigationItem(onClick = onNavigateToChat) {
                                 LabelItem(text = stringResource(Res.string.new_chat))
                             }
                         }
