@@ -1,6 +1,8 @@
 package org.dev.assistant
 
 import android.os.Build
+import org.dev.assistant.platform.Platform
+import org.dev.assistant.platform.PlatformType
 
 class AndroidPlatform : Platform {
     override val name: String = "Android ${Build.VERSION.SDK_INT}"

@@ -1,8 +1,5 @@
 package org.dev.assistant.platform
 
-import org.dev.assistant.PlatformType
-import org.dev.assistant.currentPlatformType
-import org.dev.assistant.getPlatform
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

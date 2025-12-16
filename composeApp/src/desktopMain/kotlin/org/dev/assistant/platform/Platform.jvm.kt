@@ -1,4 +1,4 @@
-package org.dev.assistant
+package org.dev.assistant.platform
 
 class JVMPlatform: Platform {
     override val name: String = "Java ${System.getProperty("java.version")}"

@@ -1,4 +1,4 @@
-package org.dev.assistant
+package org.dev.assistant.platform
 
 enum class PlatformType {
     ANDROID,
