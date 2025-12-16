@@ -2,6 +2,7 @@ package org.dev.assistant.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.PermanentDrawerSheet
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.dev.assistant.Res
 import org.dev.assistant.app_heading
+import org.dev.assistant.design_system.themes.navigationItemSpace
 import org.dev.assistant.design_system.ui.Heading
 import org.dev.assistant.design_system.ui.LabelItem
 import org.dev.assistant.design_system.ui.SideNavigationDivider
@@ -39,10 +41,13 @@ fun SideNavigationUI(
                     SideNavigationItem {
                         Heading(text = stringResource(Res.string.app_heading))
                     }
-                    SideNavigationDivider()
-                    SideNavigationItem {
-                        LabelItem(text = stringResource(Res.string.new_chat))
+                    Column {
+                        SideNavigationDivider()
+                        SideNavigationItem {
+                            LabelItem(text = stringResource(Res.string.new_chat))
+                        }
                     }
+                    Spacer(modifier = Modifier.navigationItemSpace())
                 }
             }
         }
