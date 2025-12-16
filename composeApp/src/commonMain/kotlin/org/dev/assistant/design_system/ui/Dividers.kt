@@ -1,0 +1,13 @@
+package org.dev.assistant.design_system.ui
+
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.Divider
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun SideNavigationDivider() {
+    Divider(modifier = Modifier.fillMaxWidth().height(2.dp))
+}
