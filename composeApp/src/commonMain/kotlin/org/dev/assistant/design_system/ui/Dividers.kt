@@ -9,5 +9,5 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SideNavigationDivider() {
-    Divider(modifier = Modifier.fillMaxWidth().height(2.dp))
+    Divider(modifier = Modifier.fillMaxWidth().height(1.dp))
 }

@@ -42,14 +42,15 @@ fun SideNavigationUI(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
     val drawerMinWidth = MaterialTheme.dimension().drawerMinWidth
     val dividerColor = MaterialTheme.colorScheme.outlineVariant
+    val bgColor = MaterialTheme.colorScheme.surfaceVariant
 
     PermanentNavigationDrawer(
         drawerContent = {
             Box(
-                modifier = Modifier.sizeIn(maxWidth = drawerMinWidth)
+                modifier = Modifier.sizeIn(maxWidth = drawerMinWidth).background(bgColor)
             ) {
                 PermanentDrawerSheet(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize().padding(16.dp)
                 ) {
                     Column(
                         modifier = Modifier.fillMaxHeight(),
