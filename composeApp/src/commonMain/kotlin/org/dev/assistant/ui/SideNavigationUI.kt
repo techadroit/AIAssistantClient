@@ -1,20 +1,22 @@
 package org.dev.assistant.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.requiredWidthIn
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.PermanentNavigationDrawer
-import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.dev.assistant.Res
@@ -43,24 +45,35 @@ fun SideNavigationUI(
 
     PermanentNavigationDrawer(
         drawerContent = {
-            PermanentDrawerSheet(
+            Box(
                 modifier = Modifier.sizeIn(maxWidth = drawerMinWidth)
             ) {
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.SpaceBetween
+                PermanentDrawerSheet(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    SideNavigationItem {
-                        Heading(text = stringResource(Res.string.app_heading))
-                    }
-                    Column {
-                        SideNavigationDivider()
+                    Column(
+                        modifier = Modifier.fillMaxHeight(),
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
                         SideNavigationItem {
-                            LabelItem(text = stringResource(Res.string.new_chat))
+                            Heading(text = stringResource(Res.string.app_heading))
                         }
+                        Column {
+                            SideNavigationDivider()
+                            SideNavigationItem {
+                                LabelItem(text = stringResource(Res.string.new_chat))
+                            }
+                        }
+                        Spacer(modifier = Modifier.navigationItemSpace())
                     }
-                    Spacer(modifier = Modifier.navigationItemSpace())
                 }
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(1.dp)
+                        .align(Alignment.CenterEnd)
+                        .background(dividerColor)
+                )
             }
         }
     ) {

@@ -30,7 +30,7 @@ fun Modifier.homePadding() = padding(
 
 @Composable
 fun Modifier.navigationItemSpace() = padding(
-    start = MaterialTheme.dimension().cardHorizontalPadding,
+    start = 0.dp,
     end = 0.dp,
     top = MaterialTheme.dimension().cardVerticalPadding,
     bottom = MaterialTheme.dimension().cardVerticalPadding,
