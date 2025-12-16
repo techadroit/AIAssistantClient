@@ -6,16 +6,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.requiredWidthIn
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.PermanentNavigationDrawer
+import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import org.dev.assistant.Res
 import org.dev.assistant.app_heading
@@ -42,9 +42,10 @@ fun SideNavigationUI(
     val dividerColor = MaterialTheme.colorScheme.outlineVariant
 
     PermanentNavigationDrawer(
-        modifier = Modifier.defaultMinSize(minWidth = drawerMinWidth),
         drawerContent = {
-            PermanentDrawerSheet {
+            PermanentDrawerSheet(
+                modifier = Modifier.sizeIn(maxWidth = drawerMinWidth)
+            ) {
                 Column(
                     modifier = Modifier.fillMaxHeight(),
                     verticalArrangement = Arrangement.SpaceBetween
