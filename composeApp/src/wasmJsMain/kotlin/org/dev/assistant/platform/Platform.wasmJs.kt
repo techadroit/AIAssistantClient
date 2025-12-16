@@ -1,7 +1,4 @@
-package org.dev.assistant
-
-import org.dev.assistant.platform.Platform
-import org.dev.assistant.platform.PlatformType
+package org.dev.assistant.platform
 
 class WasmPlatform: Platform {
     override val name: String = "Web with Kotlin/Wasm"
