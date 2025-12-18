@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -17,7 +18,7 @@ import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-class NetworkClient(val baseUrl: String) {
+class NetworkClient(val baseUrl: String,val urlProtocol: URLProtocol = URLProtocol.HTTP) {
     val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json {
@@ -25,7 +26,9 @@ class NetworkClient(val baseUrl: String) {
                 isLenient = true
             })
         }
+        install(Logging)
     }
+
 
     suspend inline fun <reified T> get(
         path: String? = null,
@@ -33,9 +36,9 @@ class NetworkClient(val baseUrl: String) {
         queryParams: Map<String, String> = emptyMap()
     ): Result<T> {
         return runCatching {
-            client.get {
+            val request = client.get {
                 url {
-                    protocol = URLProtocol.HTTPS
+                    protocol = urlProtocol
                     host = baseUrl
                     path?.let {
                         path(it)
@@ -47,7 +50,8 @@ class NetworkClient(val baseUrl: String) {
                         parameters.append(key, value)
                     }
                 }
-            }.body<T>()
+            }
+            request.body<T>()
         }
     }
 
@@ -60,7 +64,7 @@ class NetworkClient(val baseUrl: String) {
         return runCatching {
             client.post {
                 url {
-                    protocol = URLProtocol.HTTPS
+                    protocol = urlProtocol
                     host = baseUrl
                     path?.let {
                         path(it)
@@ -89,7 +93,7 @@ class NetworkClient(val baseUrl: String) {
         return runCatching {
             client.put {
                 url {
-                    protocol = URLProtocol.HTTPS
+                    protocol = urlProtocol
                     host = baseUrl
                     path?.let {
                         path(it)
@@ -117,7 +121,7 @@ class NetworkClient(val baseUrl: String) {
         return runCatching {
             client.delete {
                 url {
-                    protocol = URLProtocol.HTTPS
+                    protocol = protocol
                     host = baseUrl
                     path?.let {
                         path(it)

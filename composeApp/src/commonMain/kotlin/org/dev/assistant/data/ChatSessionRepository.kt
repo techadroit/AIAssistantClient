@@ -1,6 +1,11 @@
 package org.dev.assistant.data
 
-import org.dev.assistant.data.model.*
+import org.dev.assistant.data.model.ChatSessionCreateRequest
+import org.dev.assistant.data.model.ChatSessionCreateResponse
+import org.dev.assistant.data.model.ChatSessionListResponse
+import org.dev.assistant.data.model.ChatSessionResponse
+import org.dev.assistant.data.model.ChatSessionUpdateRequest
+import org.dev.assistant.data.model.OperationResponse
 import org.dev.assistant.network.NetworkClient
 
 class ChatSessionRepository(private val networkClient: NetworkClient) {
@@ -10,7 +15,7 @@ class ChatSessionRepository(private val networkClient: NetworkClient) {
      */
     suspend fun createChatSession(request: ChatSessionCreateRequest): Result<ChatSessionCreateResponse> {
         return networkClient.post(
-            path = "api/chat/sessions",
+            path = "/api/chat/sessions",
             body = request
         )
     }
@@ -20,7 +25,7 @@ class ChatSessionRepository(private val networkClient: NetworkClient) {
      */
     suspend fun getChatSession(chatSessionId: String): Result<ChatSessionResponse> {
         return networkClient.get(
-            path = "api/chat/sessions/$chatSessionId"
+            path = "/api/chat/sessions/$chatSessionId"
         )
     }
 
@@ -32,7 +37,7 @@ class ChatSessionRepository(private val networkClient: NetworkClient) {
         request: ChatSessionUpdateRequest
     ): Result<OperationResponse> {
         return networkClient.put(
-            path = "api/chat/sessions/$chatSessionId",
+            path = "/api/chat/sessions/$chatSessionId",
             body = request
         )
     }
@@ -42,7 +47,7 @@ class ChatSessionRepository(private val networkClient: NetworkClient) {
      */
     suspend fun deleteChatSession(chatSessionId: String): Result<OperationResponse> {
         return networkClient.delete(
-            path = "api/chat/sessions/$chatSessionId"
+            path = "/api/chat/sessions/$chatSessionId"
         )
     }
 
@@ -53,10 +58,11 @@ class ChatSessionRepository(private val networkClient: NetworkClient) {
         userId: String,
         includeArchived: Boolean = false
     ): Result<ChatSessionListResponse> {
-        return networkClient.get(
-            path = "api/chat/users/$userId/sessions",
+        val response: Result<ChatSessionListResponse> = networkClient.get(
+            path = "/api/chat/users/$userId/sessions",
             queryParams = mapOf("include_archived" to includeArchived.toString())
         )
+        return response
     }
 
     /**
@@ -64,7 +70,7 @@ class ChatSessionRepository(private val networkClient: NetworkClient) {
      */
     suspend fun archiveChatSession(chatSessionId: String): Result<OperationResponse> {
         return networkClient.put(
-            path = "api/chat/sessions/$chatSessionId/archive"
+            path = "/api/chat/sessions/$chatSessionId/archive"
         )
     }
 }

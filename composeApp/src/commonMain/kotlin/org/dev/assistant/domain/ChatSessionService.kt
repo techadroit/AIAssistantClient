@@ -49,9 +49,10 @@ class ChatSessionService(
             val userId = userService.getUserId()
                 .getOrElse { throw IllegalStateException("User not authenticated", it) }
 
-            chatSessionRepository.getUserChatSessions(userId, includeArchived)
+            val sessionList = chatSessionRepository.getUserChatSessions(userId, includeArchived)
                 .getOrThrow()
                 .chatSessions
+            sessionList
         }
     }
 }

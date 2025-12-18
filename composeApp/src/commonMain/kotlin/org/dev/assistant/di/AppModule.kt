@@ -11,7 +11,7 @@ import org.dev.assistant.ui.main.MainViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
-private var apiBaseUrl = "http://localhost:8001/api"
+private var apiBaseUrl = "127.0.0.1:8001"
 
 val appModule = module {
     // Add your dependencies here
