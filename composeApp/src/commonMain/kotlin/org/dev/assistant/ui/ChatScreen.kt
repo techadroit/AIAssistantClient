@@ -65,7 +65,15 @@ const val CHAT_MODE_LABEL = "Chat Mode"
 const val SELECT_CHAT_MODE = "Select mode"
 
 @Composable
-fun ChatScreen(modifier: Modifier,viewmodel: ChatViewModel = koinViewModel()) {
+fun ChatScreen(
+    modifier: Modifier,
+    chatSessionId: String? = null,
+    viewmodel: ChatViewModel = koinViewModel()
+) {
+    // Set chat session ID when provided
+    androidx.compose.runtime.LaunchedEffect(chatSessionId) {
+        viewmodel.setChatSessionId(chatSessionId)
+    }
 
     val state = viewmodel.messages.collectAsState()
     val isConnected = viewmodel.isConnected.collectAsState()

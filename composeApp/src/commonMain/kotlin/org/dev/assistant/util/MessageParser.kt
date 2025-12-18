@@ -35,9 +35,10 @@ object MessageParser {
         )
     }
 
-    fun toChatMessage(message: SentMessage): String {
+    fun toChatMessage(message: SentMessage, chatSessionId: String): String {
         val chatMessages = ChatMessages(
             messageId = message.id,
+            chatSessionId = chatSessionId,
             utcTime = "",
             sender = "user",
             receiver = "assistant",

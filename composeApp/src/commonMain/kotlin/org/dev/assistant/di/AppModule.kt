@@ -7,6 +7,7 @@ import org.dev.assistant.domain.UserService
 import org.dev.assistant.network.NetworkClient
 import org.dev.assistant.ui.chat.ChatViewModel
 import org.dev.assistant.ui.home.HomeViewModel
+import org.dev.assistant.ui.main.MainViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -31,6 +32,7 @@ val serviceModule = module {
 val viewmodelModule = module {
     viewModelOf(::ChatViewModel)
     viewModelOf(::HomeViewModel)
+    viewModelOf(::MainViewModel)
 }
 
 

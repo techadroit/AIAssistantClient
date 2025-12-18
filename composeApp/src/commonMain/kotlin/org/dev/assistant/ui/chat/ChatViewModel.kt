@@ -30,6 +30,9 @@ class ChatViewModel(
     private val _isConnected = MutableStateFlow(false)
     val isConnected: StateFlow<Boolean> = _isConnected
 
+    // Chat session ID
+    private var currentChatSessionId: String? = null
+
     // File upload service instance
     private val fileUploadService = FileUploadService()
 
@@ -79,14 +82,37 @@ class ChatViewModel(
 
     fun sendMessage(content: String) {
         viewModelScope.launch {
-            val message = SentMessage(
-                msg = content,
-                id = "",
-                agentMode = ChatMode(mode = _chatMode.value)
-            )
-            _messages.value += message
-            websocketClient.sendMessage(MessageParser.toChatMessage(message))
+            // Create or use existing chat session
+            if (currentChatSessionId == null) {
+                chatService.createChatSession(null)
+                    .onSuccess { sessionId ->
+                        currentChatSessionId = sessionId
+                        sendMessageWithSession(content)
+                    }
+                    .onFailure { error ->
+                        println("Failed to create chat session: ${error.message}")
+                    }
+            } else {
+                sendMessageWithSession(content)
+            }
         }
+    }
+
+    private suspend fun sendMessageWithSession(content: String) {
+        val message = SentMessage(
+            msg = content,
+            id = "",
+            agentMode = ChatMode(mode = _chatMode.value)
+        )
+        _messages.value += message
+
+        currentChatSessionId?.let { sessionId ->
+            websocketClient.sendMessage(MessageParser.toChatMessage(message, sessionId))
+        }
+    }
+
+    fun setChatSessionId(sessionId: String?) {
+        currentChatSessionId = sessionId
     }
 
     /**

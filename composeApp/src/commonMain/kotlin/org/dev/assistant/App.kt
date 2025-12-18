@@ -24,6 +24,7 @@ fun App() {
 fun MainApp() {
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
     var chatKey by remember { mutableStateOf(0) }
+    var currentChatSessionId by remember { mutableStateOf<String?>(null) }
 
     HomeTheme {
         Scaffold { padding ->
@@ -34,16 +35,26 @@ fun MainApp() {
                 onNavigateToChat = {
                     // Increment key to create a new chat instance
                     chatKey++
+                    currentChatSessionId = null
                     currentScreen = Screen.Chat
                 },
                 onNavigateToSettings = {},
-                onNavigateToAbout = {}
+                onNavigateToAbout = {},
+                onChatSessionClick = { sessionId ->
+                    // Navigate to existing chat session
+                    chatKey++
+                    currentChatSessionId = sessionId
+                    currentScreen = Screen.Chat
+                }
             ) {
                 when (currentScreen) {
                     Screen.Home -> HomeScreen(modifier = Modifier)
                     Screen.Chat -> {
                         key(chatKey) {
-                            ChatScreen(modifier = Modifier)
+                            ChatScreen(
+                                modifier = Modifier,
+                                chatSessionId = currentChatSessionId
+                            )
                         }
                     }
                 }

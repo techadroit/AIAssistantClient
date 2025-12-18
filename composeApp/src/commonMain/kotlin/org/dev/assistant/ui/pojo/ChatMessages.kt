@@ -34,6 +34,7 @@ fun ChatMode.off() = copy(mode = ChatModeType.NONE)
 data class ChatMessages(
     @SerialName("message_id") val messageId: String,
     @SerialName("utc_time") val utcTime: String,
+    @SerialName("chat_session_id") val chatSessionId: String,
     val sender: String,
     val receiver: String,
     val message: ChatMessageBody,
