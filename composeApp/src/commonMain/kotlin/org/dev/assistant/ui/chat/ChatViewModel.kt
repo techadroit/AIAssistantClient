@@ -1,4 +1,4 @@
-package org.dev.assistant.ui
+package org.dev.assistant.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.dev.assistant.data.SessionManager
 import org.dev.assistant.data.WebSocketClient
+import org.dev.assistant.domain.ChatSessionService
 import org.dev.assistant.ui.pojo.ChatMessages
 import org.dev.assistant.ui.pojo.ChatMode
 import org.dev.assistant.ui.pojo.ChatModeType
@@ -17,9 +18,11 @@ import org.dev.assistant.util.FilePicker
 import org.dev.assistant.util.FileUploadService
 import org.dev.assistant.util.MessageParser
 import org.dev.assistant.util.UploadState
+import kotlin.collections.plus
 
-
-class ChatViewModel : ViewModel() {
+class ChatViewModel(
+    val chatService: ChatSessionService
+) : ViewModel() {
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     private val sessionManager = SessionManager()
     val messages: StateFlow<List<Message>> = _messages
@@ -159,7 +162,7 @@ class ChatViewModel : ViewModel() {
                         when (state) {
                             is UploadState.Success -> {
                                 // Add a message to chat indicating file was uploaded
-                                _messages.value += SentMessage(
+                                _messages.value + SentMessage(
                                     msg = "📎 Uploaded file: ${fileData.name}",
                                     id = ""
                                 )

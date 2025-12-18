@@ -1,4 +1,4 @@
-package org.dev.assistant.ui
+package org.dev.assistant.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

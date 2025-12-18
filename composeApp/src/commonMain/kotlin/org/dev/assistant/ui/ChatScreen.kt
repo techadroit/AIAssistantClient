@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.dev.assistant.data.Product
 import org.dev.assistant.design_system.themes.getChatBackgroundColor
+import org.dev.assistant.ui.chat.ChatViewModel
 import org.dev.assistant.ui.pojo.ChatModeType
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.ReceiveMessage
@@ -38,6 +39,7 @@ import org.dev.assistant.ui.pojo.SentMessage
 import org.dev.assistant.util.UploadState
 import org.dev.assistant.util.edgeShadow
 import org.dev.assistant.util.getFilePicker
+import org.koin.compose.viewmodel.koinViewModel
 
 // String Constants
 const val CHAT = "chat"
@@ -63,8 +65,8 @@ const val CHAT_MODE_LABEL = "Chat Mode"
 const val SELECT_CHAT_MODE = "Select mode"
 
 @Composable
-fun ChatScreen(modifier: Modifier) {
-    val viewmodel = ChatViewModel()
+fun ChatScreen(modifier: Modifier,viewmodel: ChatViewModel = koinViewModel()) {
+
     val state = viewmodel.messages.collectAsState()
     val isConnected = viewmodel.isConnected.collectAsState()
     val uploadState = viewmodel.uploadState.collectAsState()
