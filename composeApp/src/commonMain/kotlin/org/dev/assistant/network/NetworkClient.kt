@@ -3,6 +3,7 @@ package org.dev.assistant.network
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.cio.endpoint
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.delete
@@ -18,7 +19,18 @@ import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-class NetworkClient(val baseUrl: String,val urlProtocol: URLProtocol = URLProtocol.HTTP) {
+class NetworkClient(val baseUrl: String, val urlProtocol: URLProtocol = URLProtocol.HTTP) {
+
+    // Parse host and port from baseUrl
+    val host: String
+    val port: Int
+
+    init {
+        val parts = baseUrl.split(":")
+        host = parts[0]
+        port = parts.getOrNull(1)?.toIntOrNull() ?: if (urlProtocol == URLProtocol.HTTPS) 443 else 80
+    }
+
     val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json {
@@ -27,6 +39,12 @@ class NetworkClient(val baseUrl: String,val urlProtocol: URLProtocol = URLProtoc
             })
         }
         install(Logging)
+        engine {
+            endpoint {
+                connectTimeout = 30_000
+                socketTimeout = 30_000
+            }
+        }
     }
 
 
@@ -39,7 +57,8 @@ class NetworkClient(val baseUrl: String,val urlProtocol: URLProtocol = URLProtoc
             val request = client.get {
                 url {
                     protocol = urlProtocol
-                    host = baseUrl
+                    host = this@NetworkClient.host
+                    port = this@NetworkClient.port
                     path?.let {
                         path(it)
                     }
@@ -65,7 +84,8 @@ class NetworkClient(val baseUrl: String,val urlProtocol: URLProtocol = URLProtoc
             client.post {
                 url {
                     protocol = urlProtocol
-                    host = baseUrl
+                    host = this@NetworkClient.host
+                    port = this@NetworkClient.port
                     path?.let {
                         path(it)
                     }
@@ -94,7 +114,8 @@ class NetworkClient(val baseUrl: String,val urlProtocol: URLProtocol = URLProtoc
             client.put {
                 url {
                     protocol = urlProtocol
-                    host = baseUrl
+                    host = this@NetworkClient.host
+                    port = this@NetworkClient.port
                     path?.let {
                         path(it)
                     }
@@ -121,8 +142,9 @@ class NetworkClient(val baseUrl: String,val urlProtocol: URLProtocol = URLProtoc
         return runCatching {
             client.delete {
                 url {
-                    protocol = protocol
-                    host = baseUrl
+                    protocol = urlProtocol
+                    host = this@NetworkClient.host
+                    port = this@NetworkClient.port
                     path?.let {
                         path(it)
                     }
