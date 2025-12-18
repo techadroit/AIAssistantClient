@@ -58,6 +58,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -77,6 +78,9 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.websockets)
             implementation(libs.kotlinx.io.core)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
 //            implementation(libs.coil.core)
 //            implementation(libs.coil.compose)
 //            implementation(libs.coil.network.ktor)
