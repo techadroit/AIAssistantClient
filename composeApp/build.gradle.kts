@@ -12,6 +12,11 @@ plugins {
     kotlin("plugin.serialization") version "1.9.0"
 }
 
+repositories {
+    google()
+    mavenCentral()
+}
+
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
