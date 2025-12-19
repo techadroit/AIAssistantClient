@@ -1,5 +1,7 @@
 package org.dev.assistant.util
 
+import io.ktor.util.date.getTimeMillis
+import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.dev.assistant.ui.pojo.ChatMessages
@@ -37,9 +39,9 @@ object MessageParser {
 
     fun toChatMessage(message: SentMessage, chatSessionId: String): String {
         val chatMessages = ChatMessages(
-            messageId = message.id,
+            messageId = getTimeMillis().toString(),
             chatSessionId = chatSessionId,
-            utcTime = "",
+            utcTime = currentUtcTimestamp(),
             sender = "user",
             receiver = "assistant",
             message = org.dev.assistant.ui.pojo.ChatMessageBody(messages = message.msg),

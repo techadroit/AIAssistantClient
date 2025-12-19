@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import org.dev.assistant.data.SessionManager
 import org.dev.assistant.data.WebSocketClient
 import org.dev.assistant.domain.ChatSessionService
+import org.dev.assistant.domain.UserService
 import org.dev.assistant.ui.pojo.ChatMessages
 import org.dev.assistant.ui.pojo.ChatMode
 import org.dev.assistant.ui.pojo.ChatModeType
@@ -21,7 +23,8 @@ import org.dev.assistant.util.UploadState
 import kotlin.collections.plus
 
 class ChatViewModel(
-    val chatService: ChatSessionService
+    val chatService: ChatSessionService,
+    val userService: UserService
 ) : ViewModel() {
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     private val sessionManager = SessionManager()
@@ -84,7 +87,7 @@ class ChatViewModel(
         viewModelScope.launch {
             // Create or use existing chat session
             if (currentChatSessionId == null) {
-                chatService.createChatSession(null)
+                chatService.createChatSession(content)
                     .onSuccess { sessionId ->
                         currentChatSessionId = sessionId
                         sendMessageWithSession(content)
@@ -101,7 +104,7 @@ class ChatViewModel(
     private suspend fun sendMessageWithSession(content: String) {
         val message = SentMessage(
             msg = content,
-            id = "",
+            id = "${userService.getUserId()}_${Clock.System.now().toEpochMilliseconds()}",
             agentMode = ChatMode(mode = _chatMode.value)
         )
         _messages.value += message
