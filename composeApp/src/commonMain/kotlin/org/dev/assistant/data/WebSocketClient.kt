@@ -33,7 +33,7 @@ class WebSocketClient {
     private val sessionManager = SessionManager()
     private val json = Json { ignoreUnknownKeys = true }
     var url = getUrlProvider().wsUrl+"/"+sessionManager.getSessionId()
-    val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val client = HttpClient(CIO) {
         install(WebSockets) {
 //            pingInterval = 50000
@@ -52,7 +52,7 @@ class WebSocketClient {
     fun connect() {
         scope.launch {
 
-            withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Default) {
                 try {
                     println(" Connecting to $url")
                     tryConnect(url)

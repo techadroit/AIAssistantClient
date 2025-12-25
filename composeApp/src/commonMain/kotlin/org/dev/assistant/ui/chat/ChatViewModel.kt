@@ -8,10 +8,11 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.dev.assistant.data.SessionManager
 import org.dev.assistant.data.WebSocketClient
+import org.dev.assistant.data.model.toChatMessages
+import org.dev.assistant.domain.ChatMessageService
 import org.dev.assistant.domain.ChatSessionService
 import org.dev.assistant.domain.UserService
 import org.dev.assistant.ui.pojo.ChatMessages
-import org.dev.assistant.ui.pojo.ChatMode
 import org.dev.assistant.ui.pojo.ChatModeType
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.SentMessage
@@ -20,11 +21,11 @@ import org.dev.assistant.util.FilePicker
 import org.dev.assistant.util.FileUploadService
 import org.dev.assistant.util.MessageParser
 import org.dev.assistant.util.UploadState
-import kotlin.collections.plus
 
 class ChatViewModel(
     val chatService: ChatSessionService,
-    val userService: UserService
+    val userService: UserService,
+    val chatMessageService: ChatMessageService
 ) : ViewModel() {
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     private val sessionManager = SessionManager()
@@ -55,6 +56,18 @@ class ChatViewModel(
             observeWebConnection()
             receiveMessages()
         }
+    }
+
+    suspend fun getAllMessages(sessionId: String) {
+        chatMessageService.getAllMessages(sessionId)
+            .onSuccess { chatMessagesList ->
+                chatMessagesList.messages.forEach {
+                    processMessage(it.toChatMessages())
+                }
+            }
+            .onFailure { error ->
+                println("Failed to fetch messages: ${error.message}")
+            }
     }
 
     private suspend fun receiveMessages() {
@@ -105,7 +118,7 @@ class ChatViewModel(
         val message = SentMessage(
             msg = content,
             id = "${userService.getUserId()}_${Clock.System.now().toEpochMilliseconds()}",
-            agentMode = ChatMode(mode = _chatMode.value)
+            agentMode = _chatMode.value
         )
         _messages.value += message
 

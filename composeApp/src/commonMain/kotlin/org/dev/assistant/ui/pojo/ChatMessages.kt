@@ -23,14 +23,6 @@ enum class ChatModeType(val value: String) {
 }
 
 @Serializable
-data class ChatMode(
-    val mode: ChatModeType = ChatModeType.NONE
-)
-
-fun ChatMode.on() = copy(mode = ChatModeType.AGENT)
-fun ChatMode.off() = copy(mode = ChatModeType.NONE)
-
-@Serializable
 data class ChatMessages(
     @SerialName("message_id") val messageId: String,
     @SerialName("utc_time") val utcTime: String,
@@ -38,5 +30,5 @@ data class ChatMessages(
     val sender: String,
     val receiver: String,
     val message: ChatMessageBody,
-    val chat_mode: ChatMode = ChatMode()
+    @SerialName("chat_mode") val chat_mode: ChatModeType = ChatModeType.NONE
 )

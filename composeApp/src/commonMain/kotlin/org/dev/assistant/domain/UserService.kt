@@ -4,6 +4,6 @@ class UserService {
 
     fun getUserId(): Result<String> {
         // Placeholder implementation
-        return Result.success("cec4d0a8-014e-480b-90ff-eba22b942f5c")
+        return Result.success("0711e68c-838f-491d-ba6a-2c1ca5e2ded1")
     }
 }

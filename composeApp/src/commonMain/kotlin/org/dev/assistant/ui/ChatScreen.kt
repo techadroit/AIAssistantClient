@@ -73,6 +73,7 @@ fun ChatScreen(
     // Set chat session ID when provided
     androidx.compose.runtime.LaunchedEffect(chatSessionId) {
         viewmodel.setChatSessionId(chatSessionId)
+        viewmodel.getAllMessages(chatSessionId ?: return@LaunchedEffect)
     }
 
     val state = viewmodel.messages.collectAsState()

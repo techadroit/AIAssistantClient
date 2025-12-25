@@ -1,7 +1,9 @@
 package org.dev.assistant.di
 
+import org.dev.assistant.data.ChatMessageRepository
 import org.dev.assistant.data.ChatSessionRepository
 import org.dev.assistant.data.UserRepository
+import org.dev.assistant.domain.ChatMessageService
 import org.dev.assistant.domain.ChatSessionService
 import org.dev.assistant.domain.UserService
 import org.dev.assistant.network.NetworkClient
@@ -22,11 +24,13 @@ val appModule = module {
 val repositoryModule = module {
     single { UserRepository(get()) }
     single { ChatSessionRepository(get()) }
+    single { ChatMessageRepository(get()) }
 }
 
 val serviceModule = module {
     single { UserService() }
     single { ChatSessionService(get(), get()) }
+    single { ChatMessageService(get()) }
 }
 
 val viewmodelModule = module {
