@@ -9,11 +9,11 @@ sealed class Message(
 data class SentMessage(
     override val msg: String,
     override val id: String,
-    override val agentMode: ChatModeType = ChatModeType.NONE
+    override val agentMode: ChatModeType
 ) : Message(msg, id, agentMode)
 
 data class ReceiveMessage(
     override val msg: String,
     override val id: String,
-    override val agentMode: ChatModeType = ChatModeType.NONE
+    override val agentMode: ChatModeType
 ) : Message(msg, id, agentMode)

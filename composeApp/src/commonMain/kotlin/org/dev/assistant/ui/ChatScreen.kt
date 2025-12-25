@@ -443,11 +443,13 @@ fun PreviewChatMessage() {
     )
     val receiveMessage = ReceiveMessage(
         msg = SAMPLE_PRODUCTS_MESSAGE,
-        id = ""
+        id = "",
+        ChatModeType.OFFLINE
     )
     val sentMessage = SentMessage(
         msg = THANK_YOU_MESSAGE,
-        id = ""
+        id = "",
+        ChatModeType.OFFLINE
     )
     Column {
         ChatMessage(message = receiveMessage)

@@ -15,17 +15,8 @@ object MessageParser {
         ignoreUnknownKeys = true
         prettyPrint = false
         isLenient = true
+        encodeDefaults = true
     }
-
-//    fun parseMessage(message: SocketMessage): ReceiveMessage {
-//
-//        println(" the message is $message")
-//
-//        return ReceiveMessage(
-//            msg = message.responseMessage ?: "",
-//            id = message.messageId ?: ""
-//        )
-//    }
 
     fun parseMessage(message: ChatMessages): ReceiveMessage {
 
@@ -33,7 +24,8 @@ object MessageParser {
 
         return ReceiveMessage(
             msg = message.message.messages,
-            id = message.messageId
+            id = message.messageId,
+            agentMode = message.chat_mode
         )
     }
 
@@ -47,6 +39,7 @@ object MessageParser {
             message = org.dev.assistant.ui.pojo.ChatMessageBody(messages = message.msg),
             chat_mode = message.agentMode
         )
-        return json.encodeToString(chatMessages)
+        val res = json.encodeToString(chatMessages)
+        return res
     }
 }

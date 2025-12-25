@@ -18,8 +18,8 @@ enum class ChatModeType(val value: String) {
     WEBSEARCH("websearch"),
     @SerialName("agent")
     AGENT("agent"),
-    @SerialName("none")
-    NONE("none")
+    @SerialName("offline")
+    OFFLINE("offline")
 }
 
 @Serializable
@@ -30,5 +30,5 @@ data class ChatMessages(
     val sender: String,
     val receiver: String,
     val message: ChatMessageBody,
-    @SerialName("chat_mode") val chat_mode: ChatModeType = ChatModeType.NONE
+    @SerialName("chat_mode") val chat_mode: ChatModeType = ChatModeType.OFFLINE
 )

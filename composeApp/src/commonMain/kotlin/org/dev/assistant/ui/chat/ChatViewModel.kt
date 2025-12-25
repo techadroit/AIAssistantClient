@@ -45,7 +45,7 @@ class ChatViewModel(
     val uploadState: StateFlow<UploadState> = _uploadState
 
     // Agent mode state
-    private val _chatMode = MutableStateFlow(ChatModeType.NONE)
+    private val _chatMode = MutableStateFlow(ChatModeType.OFFLINE)
     val chatMode: StateFlow<ChatModeType> = _chatMode
 
     // Base URL for your FastAPI server
@@ -206,7 +206,8 @@ class ChatViewModel(
                                 // Add a message to chat indicating file was uploaded
                                 _messages.value + SentMessage(
                                     msg = "📎 Uploaded file: ${fileData.name}",
-                                    id = ""
+                                    id = "",
+                                    ChatModeType.AGENT
                                 )
                                 println("File uploaded successfully: ${fileData.name}")
                             }
