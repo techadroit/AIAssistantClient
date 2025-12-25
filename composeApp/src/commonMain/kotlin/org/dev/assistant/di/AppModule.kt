@@ -28,7 +28,7 @@ val repositoryModule = module {
 }
 
 val serviceModule = module {
-    single { UserService() }
+    single { UserService(get()) }
     single { ChatSessionService(get(), get()) }
     single { ChatMessageService(get()) }
 }
