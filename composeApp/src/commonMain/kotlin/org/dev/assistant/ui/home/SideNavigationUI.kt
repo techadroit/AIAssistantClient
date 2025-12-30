@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,6 +45,7 @@ import org.dev.assistant.design_system.ui.SideNavigationDivider
 import org.dev.assistant.design_system.ui.SideNavigationItem
 import org.dev.assistant.home
 import org.dev.assistant.new_chat
+import org.dev.assistant.settings
 import org.dev.assistant.ui.main.MainViewModel
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -109,7 +111,26 @@ fun SideNavigationUI(
                                 }
                             }
                         }
-                        Spacer(modifier = Modifier.navigationItemSpace())
+
+                        // Settings Section at the bottom
+                        Column {
+                            SideNavigationDivider()
+                            SideNavigationItem(onClick = onNavigateToSettings) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Settings,
+                                        contentDescription = "Settings",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    LabelItem(text = stringResource(Res.string.settings))
+                                }
+                            }
+                            Spacer(modifier = Modifier.navigationItemSpace())
+                        }
                     }
                 }
                 Box(

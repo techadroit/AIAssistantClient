@@ -12,6 +12,7 @@ import org.dev.assistant.design_system.themes.HomeTheme
 import org.dev.assistant.ui.ChatScreen
 import org.dev.assistant.ui.home.HomeScreen
 import org.dev.assistant.ui.home.SideNavigationUI
+import org.dev.assistant.ui.settings.SettingsScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -38,7 +39,9 @@ fun MainApp() {
                     currentChatSessionId = null
                     currentScreen = Screen.Chat
                 },
-                onNavigateToSettings = {},
+                onNavigateToSettings = {
+                    currentScreen = Screen.Settings
+                },
                 onNavigateToAbout = {},
                 onChatSessionClick = { sessionId ->
                     // Navigate to existing chat session
@@ -57,6 +60,7 @@ fun MainApp() {
                             )
                         }
                     }
+                    Screen.Settings -> SettingsScreen(modifier = Modifier)
                 }
             }
         }
@@ -66,4 +70,5 @@ fun MainApp() {
 sealed class Screen {
     object Home : Screen()
     object Chat : Screen()
+    object Settings : Screen()
 }

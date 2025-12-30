@@ -16,4 +16,8 @@ class UserLocalRepository(val dataStoreManager: DataStoreManager) {
             dataStoreManager.saveString(DataStoreManager.USER_ID, userId)
         }
     }
+
+    suspend fun clearUserId() {
+        dataStoreManager.remove(DataStoreManager.USER_ID)
+    }
 }

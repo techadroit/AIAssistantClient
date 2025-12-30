@@ -37,4 +37,8 @@ class UserService(
     suspend fun loginAnonymously(): Result<String?> {
         return userLocalRepository.getUserId()
     }
+
+    suspend fun clearUserData() {
+        userLocalRepository.clearUserId()
+    }
 }

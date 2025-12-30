@@ -13,6 +13,7 @@ import org.dev.assistant.ui.chat.ChatViewModel
 import org.dev.assistant.ui.home.HomeViewModel
 import org.dev.assistant.ui.main.MainViewModel
 import org.dev.assistant.ui.registration.RegistrationViewModel
+import org.dev.assistant.ui.settings.SettingsViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import androidx.datastore.core.DataStore
@@ -48,6 +49,7 @@ val viewmodelModule = module {
     viewModelOf(::HomeViewModel)
     viewModelOf(::MainViewModel)
     viewModelOf(::RegistrationViewModel)
+    viewModelOf(::SettingsViewModel)
 }
 
 
