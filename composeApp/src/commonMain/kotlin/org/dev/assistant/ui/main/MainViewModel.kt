@@ -69,5 +69,23 @@ class MainViewModel(
     fun refreshSessions() {
 //        loadChatSessions()
     }
+
+    fun deleteSession(sessionId: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+
+            chatSessionService.deleteChatSession(sessionId)
+                .onSuccess {
+                    // Remove the session from the list
+                    _chatSessions.value = _chatSessions.value.filter { it.chatSessionId != sessionId }
+                }
+                .onFailure { throwable ->
+                    _error.value = throwable.message ?: "Failed to delete chat session"
+                }
+
+            _isLoading.value = false
+        }
+    }
 }
 
