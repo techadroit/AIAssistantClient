@@ -48,6 +48,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
             }
         }
         val desktopTest by getting {
@@ -60,6 +61,12 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
+            implementation(libs.androidx.datastore.preferences)
+            implementation(libs.androidx.datastore)
+        }
+        iosMain.dependencies {
+            implementation(libs.androidx.datastore.preferences)
+            implementation(libs.androidx.datastore)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -84,6 +91,8 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+//            implementation(libs.androidx.datastore.preferences)
+//            implementation(libs.androidx.datastore)
 //            implementation(libs.coil.core)
 //            implementation(libs.coil.compose)
 //            implementation(libs.coil.network.ktor)
@@ -93,6 +102,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.java)
             implementation(libs.jetbrains.ui.tooling.preview)
+            implementation(libs.androidx.datastore.preferences)
+            implementation(libs.androidx.datastore)
 
 //            implementation(libs.coil.compose)
 //            implementation(compose.desktop.common)

@@ -5,6 +5,24 @@ import kotlinx.serialization.Serializable
 
 // Request Models
 @Serializable
+data class AnonymousUserRequest(
+    @SerialName("device_id")
+    val username: String = ""
+)
+
+@Serializable
+data class AnonymousUserResponse(
+    @SerialName("user_id")
+    val userId: String,
+    @SerialName("is_anonymous")
+    val isAnonymous: Boolean,
+    @SerialName("message")
+    val message: String,
+)
+
+
+// Request Models
+@Serializable
 data class UserCreateRequest(
     @SerialName("username")
     val username: String,

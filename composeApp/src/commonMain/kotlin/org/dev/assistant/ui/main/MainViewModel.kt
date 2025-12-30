@@ -8,9 +8,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.dev.assistant.data.model.ChatSessionResponse
 import org.dev.assistant.domain.ChatSessionService
+import org.dev.assistant.domain.UserService
 
 class MainViewModel(
-    private val chatSessionService: ChatSessionService
+    private val chatSessionService: ChatSessionService,
+    private val userService: UserService
 ) : ViewModel() {
 
     private val _chatSessions = MutableStateFlow<List<ChatSessionResponse>>(emptyList())
@@ -23,28 +25,49 @@ class MainViewModel(
     val error: StateFlow<String?> = _error.asStateFlow()
 
     init {
-        loadChatSessions()
+        initialize()
     }
 
-    fun loadChatSessions() {
+    fun initialize() {
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-
-            chatSessionService.getUserChatSessions(includeArchived = false)
-                .onSuccess { sessions ->
-                    _chatSessions.value = sessions.sortedByDescending { it.updatedAt }
-                }
-                .onFailure { throwable ->
-                    _error.value = throwable.message ?: "Failed to load chat sessions"
-                }
-
-            _isLoading.value = false
+            loadUserId()
+            loadChatSessions()
         }
     }
 
+    suspend fun loadUserId() {
+        userService.initUserId()
+    }
+
+    suspend fun loadChatSessions() {
+
+        _isLoading.value = true
+        _error.value = null
+
+        chatSessionService.getUserChatSessions(includeArchived = false)
+            .onSuccess { sessions ->
+                _chatSessions.value = sessions.sortedByDescending { it.updatedAt }
+            }
+            .onFailure { throwable ->
+                _error.value = throwable.message ?: "Failed to load chat sessions"
+            }
+
+        _isLoading.value = false
+
+    }
+
+    suspend fun loadUser() {
+        println("loading")
+        userService.loginAnonymously().onSuccess {
+            println("logged in anonymously, user id: $it")
+        }.onFailure {
+            println("failed to login anonymously: ${it.message}")
+        }
+
+    }
+
     fun refreshSessions() {
-        loadChatSessions()
+//        loadChatSessions()
     }
 }
 

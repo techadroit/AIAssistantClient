@@ -1,5 +1,6 @@
 package org.dev.assistant.data
 
+import io.ktor.client.request.request
 import org.dev.assistant.data.model.*
 import org.dev.assistant.network.NetworkClient
 
@@ -10,8 +11,17 @@ class UserRepository(private val networkClient: NetworkClient) {
      */
     suspend fun createUser(request: UserCreateRequest): Result<UserCreateResponse> {
         return networkClient.post(
-            path = "api/users/create",
+            path = "/api/users/create",
             body = request
+        )
+    }
+
+    /**
+     * Create a new user
+     */
+    suspend fun loginAsAnonymous(): Result<AnonymousUserResponse> {
+        return networkClient.post(
+            path = "/api/users/anonymous",
         )
     }
 
@@ -20,7 +30,7 @@ class UserRepository(private val networkClient: NetworkClient) {
      */
     suspend fun getUser(userId: String): Result<UserResponse> {
         return networkClient.get(
-            path = "api/users/$userId"
+            path = "/api/users/$userId"
         )
     }
 
@@ -29,7 +39,7 @@ class UserRepository(private val networkClient: NetworkClient) {
      */
     suspend fun updateUser(userId: String, request: UserUpdateRequest): Result<UserOperationResponse> {
         return networkClient.put(
-            path = "api/users/$userId",
+            path = "/api/users/$userId",
             body = request
         )
     }
@@ -39,7 +49,7 @@ class UserRepository(private val networkClient: NetworkClient) {
      */
     suspend fun deleteUser(userId: String): Result<UserOperationResponse> {
         return networkClient.delete(
-            path = "api/users/$userId"
+            path = "/api/users/$userId"
         )
     }
 
@@ -48,7 +58,7 @@ class UserRepository(private val networkClient: NetworkClient) {
      */
     suspend fun getAllUsers(includeInactive: Boolean = false): Result<UserListResponse> {
         return networkClient.get(
-            path = "api/users",
+            path = "/api/users",
             queryParams = mapOf("include_inactive" to includeInactive.toString())
         )
     }
@@ -58,7 +68,7 @@ class UserRepository(private val networkClient: NetworkClient) {
      */
     suspend fun deactivateUser(userId: String): Result<UserOperationResponse> {
         return networkClient.put(
-            path = "api/users/$userId/deactivate"
+            path = "/api/users/$userId/deactivate"
         )
     }
 
@@ -67,7 +77,7 @@ class UserRepository(private val networkClient: NetworkClient) {
      */
     suspend fun login(request: UserLoginRequest): Result<UserLoginResponse> {
         return networkClient.post(
-            path = "api/users/auth/login",
+            path = "/api/users/auth/login",
             body = request
         )
     }
@@ -77,7 +87,7 @@ class UserRepository(private val networkClient: NetworkClient) {
      */
     suspend fun legacyLogin(request: UserLoginRequest): Result<UserLoginResponse> {
         return networkClient.post(
-            path = "api/login",
+            path = "/api/login",
             body = request
         )
     }
@@ -87,7 +97,7 @@ class UserRepository(private val networkClient: NetworkClient) {
      */
     suspend fun getUserId(): Result<String> {
         return networkClient.get(
-            path = "api/login/get_user_id"
+            path = "/api/login/get_user_id"
         )
     }
 }
