@@ -131,12 +131,12 @@ fun ChatToolbar(
     TopAppBar(
         title = { Text(CHAT) },
         actions = {
-            ConnectionSwitch(
-                isConnected = isConnected,
-                onCheckedChange = {
-                    onSwitchChange(it)
-                } // Read-only switch
-            )
+//            ConnectionSwitch(
+//                isConnected = isConnected,
+//                onCheckedChange = {
+//                    onSwitchChange(it)
+//                } // Read-only switch
+//            )
             IconButton(onClick = { onRefresh() }) {
                 Icon(Icons.Default.Refresh, contentDescription = REFRESH_CONTENT_DESC)
             }

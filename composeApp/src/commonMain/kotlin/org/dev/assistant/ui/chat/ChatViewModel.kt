@@ -25,12 +25,12 @@ import org.dev.assistant.util.UploadState
 class ChatViewModel(
     val chatService: ChatSessionService,
     val userService: UserService,
-    val chatMessageService: ChatMessageService
+    val chatMessageService: ChatMessageService,
+    val websocketClient: WebSocketClient
 ) : ViewModel() {
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
-    private val sessionManager = SessionManager()
+//    private val sessionManager = SessionManager()
     val messages: StateFlow<List<Message>> = _messages
-    val websocketClient = WebSocketClient()
     private val _isConnected = MutableStateFlow(false)
     val isConnected: StateFlow<Boolean> = _isConnected
 
@@ -194,7 +194,7 @@ class ChatViewModel(
 
                 // Use FileUploadService with progress callback
                 fileUploadService.uploadFileWithProgress(
-                    sessionId = sessionManager.getSessionId(),
+                    sessionId = userService.getUserId().getOrNull() ?: "",
                     fileData = fileData,
                     endpoint = endpoint,
                     filePicker = filePicker,

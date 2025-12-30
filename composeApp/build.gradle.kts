@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    kotlin("plugin.serialization") version "1.9.0"
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 repositories {
@@ -38,11 +38,11 @@ kotlin {
     }
     
     jvm("desktop")
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-        nodejs()
-    }
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs {
+//        browser()
+//        nodejs()
+//    }
     sourceSets {
         val desktopMain by getting
         val commonTest by getting {
@@ -54,9 +54,9 @@ kotlin {
         val desktopTest by getting {
             dependsOn(commonTest)
         }
-        val wasmJsTest by getting {
-            dependsOn(commonTest)
-        }
+//        val wasmJsTest by getting {
+//            dependsOn(commonTest)
+//        }
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -80,6 +80,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.androidx.navigation.compose)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.cio)
@@ -90,9 +91,12 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+            // Material Icons Extended for multiplatform
+            implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
-//            implementation(libs.androidx.datastore.preferences)
-//            implementation(libs.androidx.datastore)
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+            implementation(libs.androidx.datastore.preferences)
+            implementation(libs.androidx.datastore)
 //            implementation(libs.coil.core)
 //            implementation(libs.coil.compose)
 //            implementation(libs.coil.network.ktor)

@@ -1,9 +1,11 @@
 package org.dev.assistant.data
 
-class SessionManager {
+import org.dev.assistant.domain.UserService
 
-    fun getSessionId(): String {
+class SessionManager(val userService: UserService) {
+
+    suspend fun getSessionId(): String? {
         // Placeholder implementation
-        return "session-12345"
+        return userService.getUserId().getOrNull()
     }
 }

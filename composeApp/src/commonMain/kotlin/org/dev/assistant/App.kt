@@ -2,17 +2,12 @@ package org.dev.assistant
 
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
 import org.dev.assistant.design_system.themes.HomeTheme
-import org.dev.assistant.ui.ChatScreen
-import org.dev.assistant.ui.home.HomeScreen
+import org.dev.assistant.navigation.AppNavHost
+import org.dev.assistant.navigation.Screen
 import org.dev.assistant.ui.home.SideNavigationUI
-import org.dev.assistant.ui.settings.SettingsScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -23,52 +18,35 @@ fun App() {
 
 @Composable
 fun MainApp() {
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
-    var chatKey by remember { mutableStateOf(0) }
-    var currentChatSessionId by remember { mutableStateOf<String?>(null) }
+    val navController = rememberNavController()
 
     HomeTheme {
         Scaffold { padding ->
             SideNavigationUI(
                 onNavigateToHome = {
-                    currentScreen = Screen.Home
+                    navController.navigate(Screen.Home) {
+                        popUpTo(Screen.Home) { inclusive = true }
+                    }
                 },
                 onNavigateToChat = {
-                    // Increment key to create a new chat instance
-                    chatKey++
-                    currentChatSessionId = null
-                    currentScreen = Screen.Chat
+                    navController.navigate(Screen.Chat())
                 },
                 onNavigateToSettings = {
-                    currentScreen = Screen.Settings
+                    navController.navigate(Screen.Settings) {
+                        launchSingleTop = true
+                    }
                 },
                 onNavigateToAbout = {},
                 onChatSessionClick = { sessionId ->
-                    // Navigate to existing chat session
-                    chatKey++
-                    currentChatSessionId = sessionId
-                    currentScreen = Screen.Chat
+                    navController.navigate(Screen.Chat(sessionId = sessionId))
                 }
             ) {
-                when (currentScreen) {
-                    Screen.Home -> HomeScreen(modifier = Modifier)
-                    Screen.Chat -> {
-                        key(chatKey) {
-                            ChatScreen(
-                                modifier = Modifier,
-                                chatSessionId = currentChatSessionId
-                            )
-                        }
-                    }
-                    Screen.Settings -> SettingsScreen(modifier = Modifier)
-                }
+                AppNavHost(
+                    navController = navController,
+                    modifier = Modifier
+                )
             }
         }
     }
 }
 
-sealed class Screen {
-    object Home : Screen()
-    object Chat : Screen()
-    object Settings : Screen()
-}

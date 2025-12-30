@@ -18,7 +18,9 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import org.dev.assistant.data.SessionManager
 import org.dev.assistant.data.UserLocalRepository
+import org.dev.assistant.data.WebSocketClient
 
 private var apiBaseUrl = "http://127.0.0.1:8001"
 
@@ -29,6 +31,8 @@ val appModule = module {
     // DataStore - with explicit type parameters
     single<DataStore<Preferences>> { createDataStore() }
     single<DataStoreManager> { DataStoreManager(get()) }
+    single { SessionManager(get()) }
+    single { WebSocketClient(get()) }
 }
 
 val repositoryModule = module {

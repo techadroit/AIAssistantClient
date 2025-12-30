@@ -5,14 +5,12 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
-import io.ktor.http.encodeURLParameter
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.coroutineScope
@@ -23,16 +21,16 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import org.dev.assistant.domain.UserService
 import org.dev.assistant.platform.getUrlProvider
 import org.dev.assistant.ui.pojo.ChatMessages
 
 //data class SocketMessage(val content: String)
 
-class WebSocketClient {
+class WebSocketClient(val userService: UserService) {
 
-    private val sessionManager = SessionManager()
+
     private val json = Json { ignoreUnknownKeys = true }
-    var url = getUrlProvider().wsUrl+"/"+sessionManager.getSessionId()
     val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val client = HttpClient(CIO) {
         install(WebSockets) {
@@ -54,8 +52,11 @@ class WebSocketClient {
 
             withContext(Dispatchers.Default) {
                 try {
-                    println(" Connecting to $url")
-                    tryConnect(url)
+                    userService.getUserId().getOrNull()?.let {
+                        var url = getUrlProvider().wsUrl + "/" + it
+                        println(" Connecting to $url")
+                        tryConnect(url)
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                     _isConnected.value = false
@@ -132,7 +133,7 @@ class WebSocketClient {
     fun updateUrl(newUrl: String) {
         scope.launch {
             disconnect()
-            url = newUrl
+//            url = newUrl
         }
     }
 }

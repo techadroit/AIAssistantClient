@@ -6,13 +6,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.dev.assistant.data.WebSocketClient
 import org.dev.assistant.data.model.ChatSessionResponse
 import org.dev.assistant.domain.ChatSessionService
 import org.dev.assistant.domain.UserService
 
 class MainViewModel(
     private val chatSessionService: ChatSessionService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val webSocketClient: WebSocketClient
 ) : ViewModel() {
 
     private val _chatSessions = MutableStateFlow<List<ChatSessionResponse>>(emptyList())
@@ -36,7 +38,9 @@ class MainViewModel(
     }
 
     suspend fun loadUserId() {
-        userService.initUserId()
+        userService.initUserId().onSuccess {
+            webSocketClient.connect()
+        }
     }
 
     suspend fun loadChatSessions() {
@@ -54,20 +58,6 @@ class MainViewModel(
 
         _isLoading.value = false
 
-    }
-
-    suspend fun loadUser() {
-        println("loading")
-        userService.loginAnonymously().onSuccess {
-            println("logged in anonymously, user id: $it")
-        }.onFailure {
-            println("failed to login anonymously: ${it.message}")
-        }
-
-    }
-
-    fun refreshSessions() {
-//        loadChatSessions()
     }
 
     fun deleteSession(sessionId: String) {
