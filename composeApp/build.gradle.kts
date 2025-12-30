@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
@@ -10,6 +11,11 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     kotlin("plugin.serialization") version "1.9.0"
+}
+
+repositories {
+    google()
+    mavenCentral()
 }
 
 kotlin {
@@ -32,12 +38,35 @@ kotlin {
     }
     
     jvm("desktop")
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        nodejs()
+    }
     sourceSets {
         val desktopMain by getting
-        
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
+            }
+        }
+        val desktopTest by getting {
+            dependsOn(commonTest)
+        }
+        val wasmJsTest by getting {
+            dependsOn(commonTest)
+        }
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.koin.android)
+            implementation(libs.androidx.datastore.preferences)
+            implementation(libs.androidx.datastore)
+        }
+        iosMain.dependencies {
+            implementation(libs.androidx.datastore.preferences)
+            implementation(libs.androidx.datastore)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -52,11 +81,18 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.websockets)
             implementation(libs.kotlinx.io.core)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+//            implementation(libs.androidx.datastore.preferences)
+//            implementation(libs.androidx.datastore)
 //            implementation(libs.coil.core)
 //            implementation(libs.coil.compose)
 //            implementation(libs.coil.network.ktor)
@@ -66,12 +102,12 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.java)
             implementation(libs.jetbrains.ui.tooling.preview)
+            implementation(libs.androidx.datastore.preferences)
+            implementation(libs.androidx.datastore)
 
 //            implementation(libs.coil.compose)
 //            implementation(compose.desktop.common)
         }
-
-
     }
     jvmToolchain(17)
     targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
@@ -124,4 +160,10 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+compose.resources {
+    publicResClass = false
+    packageOfResClass = "org.dev.assistant"
+    generateResClass = auto
 }

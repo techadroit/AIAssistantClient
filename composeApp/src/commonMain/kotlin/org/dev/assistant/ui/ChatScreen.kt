@@ -30,7 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.dev.assistant.data.Product
-import org.dev.assistant.themes.getChatBackgroundColor
+import org.dev.assistant.design_system.themes.getChatBackgroundColor
+import org.dev.assistant.ui.chat.ChatViewModel
 import org.dev.assistant.ui.pojo.ChatModeType
 import org.dev.assistant.ui.pojo.Message
 import org.dev.assistant.ui.pojo.ReceiveMessage
@@ -38,6 +39,7 @@ import org.dev.assistant.ui.pojo.SentMessage
 import org.dev.assistant.util.UploadState
 import org.dev.assistant.util.edgeShadow
 import org.dev.assistant.util.getFilePicker
+import org.koin.compose.viewmodel.koinViewModel
 
 // String Constants
 const val CHAT = "chat"
@@ -63,8 +65,17 @@ const val CHAT_MODE_LABEL = "Chat Mode"
 const val SELECT_CHAT_MODE = "Select mode"
 
 @Composable
-fun ChatScreen() {
-    val viewmodel = ChatViewModel()
+fun ChatScreen(
+    modifier: Modifier,
+    chatSessionId: String? = null,
+    viewmodel: ChatViewModel = koinViewModel()
+) {
+    // Set chat session ID when provided
+    androidx.compose.runtime.LaunchedEffect(chatSessionId) {
+        viewmodel.setChatSessionId(chatSessionId)
+        viewmodel.getAllMessages(chatSessionId ?: return@LaunchedEffect)
+    }
+
     val state = viewmodel.messages.collectAsState()
     val isConnected = viewmodel.isConnected.collectAsState()
     val uploadState = viewmodel.uploadState.collectAsState()
@@ -143,7 +154,7 @@ fun ChatToolbar(
                 })
             }
         },
-        modifier = Modifier.edgeShadow()
+//        modifier = Modifier.edgeShadow()
     )
 
     if (showDialog) {
@@ -432,11 +443,13 @@ fun PreviewChatMessage() {
     )
     val receiveMessage = ReceiveMessage(
         msg = SAMPLE_PRODUCTS_MESSAGE,
-        id = ""
+        id = "",
+        ChatModeType.OFFLINE
     )
     val sentMessage = SentMessage(
         msg = THANK_YOU_MESSAGE,
-        id = ""
+        id = "",
+        ChatModeType.OFFLINE
     )
     Column {
         ChatMessage(message = receiveMessage)
