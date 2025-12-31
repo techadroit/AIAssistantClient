@@ -4,6 +4,7 @@ import org.dev.assistant.data.ChatSessionRepository
 import org.dev.assistant.data.model.ChatSessionCreateRequest
 import org.dev.assistant.data.model.ChatSessionResponse
 import org.dev.assistant.data.model.ChatSessionUpdateRequest
+import org.dev.assistant.data.model.OperationResponse
 import org.dev.assistant.ui.chat.ChatSessionHandler
 import org.dev.assistant.ui.chat.ChatSessionItem
 
@@ -49,8 +50,11 @@ class ChatSessionService(
         ).map { }
     }
 
-    suspend fun deleteChatSession(chatSessionId: String): Result<Unit> {
-        return chatSessionRepository.deleteChatSession(chatSessionId).map { }
+    suspend fun deleteChatSession(chatSessionId: String): Result<OperationResponse> {
+        return chatSessionRepository.deleteChatSession(chatSessionId).onSuccess {
+            // update chat session handler
+            chatSessionHandler.removeChatSession(chatSessionId)
+        }
     }
 
     suspend fun archiveChatSession(chatSessionId: String): Result<Unit> {

@@ -17,6 +17,12 @@ class ChatSessionHandler {
         currentList.addAll(chatSession)
         (sessionList as MutableStateFlow).value = currentList
     }
+
+    fun removeChatSession(chatSessionId: String) {
+        val currentList = sessionList.value.toMutableList()
+        currentList.removeAll { it.id == chatSessionId }
+        (sessionList as MutableStateFlow).value = currentList
+    }
 }
 
 data class ChatSessionState(
