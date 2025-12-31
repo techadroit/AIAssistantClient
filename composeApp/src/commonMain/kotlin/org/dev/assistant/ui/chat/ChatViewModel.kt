@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import org.dev.assistant.data.SessionManager
 import org.dev.assistant.data.WebSocketClient
 import org.dev.assistant.data.model.toChatMessages
 import org.dev.assistant.domain.ChatMessageService
@@ -21,6 +19,8 @@ import org.dev.assistant.util.FilePicker
 import org.dev.assistant.util.FileUploadService
 import org.dev.assistant.util.MessageParser
 import org.dev.assistant.util.UploadState
+import org.dev.assistant.util.getTimeInMilliseconds
+import kotlin.time.ExperimentalTime
 
 class ChatViewModel(
     val chatService: ChatSessionService,
@@ -29,7 +29,8 @@ class ChatViewModel(
     val websocketClient: WebSocketClient
 ) : ViewModel() {
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
-//    private val sessionManager = SessionManager()
+
+    //    private val sessionManager = SessionManager()
     val messages: StateFlow<List<Message>> = _messages
     private val _isConnected = MutableStateFlow(false)
     val isConnected: StateFlow<Boolean> = _isConnected
@@ -62,7 +63,8 @@ class ChatViewModel(
         chatMessageService.getAllMessages(sessionId)
             .onSuccess { chatMessagesList ->
                 chatMessagesList.messages.forEach {
-                    processMessage(it.toChatMessages())
+                    val message = MessageParser.parseMessage(it.toChatMessages())
+                    _messages.value += message
                 }
             }
             .onFailure { error ->
@@ -82,7 +84,7 @@ class ChatViewModel(
     }
 
     fun processMessage(chatMessages: ChatMessages) {
-        val message = MessageParser.parseMessage(chatMessages)
+        val message = MessageParser.parseReceiveMessage(chatMessages)
         val count = _messages.value.count { it.id == message.id }
         if (count == 0) {
             _messages.value += message
@@ -114,10 +116,11 @@ class ChatViewModel(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     private suspend fun sendMessageWithSession(content: String) {
         val message = SentMessage(
             msg = content,
-            id = "${userService.getUserId()}_${Clock.System.now().toEpochMilliseconds()}",
+            id = "${userService.getUserId()}_${getTimeInMilliseconds()}",
             agentMode = _chatMode.value
         )
         _messages.value += message
@@ -211,9 +214,11 @@ class ChatViewModel(
                                 )
                                 println("File uploaded successfully: ${fileData.name}")
                             }
+
                             is UploadState.Error -> {
                                 println("Upload error: ${state.message}")
                             }
+
                             else -> {}
                         }
                     }

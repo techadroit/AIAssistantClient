@@ -1,7 +1,9 @@
 package org.dev.assistant.util
 
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 fun currentUtcTimestamp(): String {
     val utcDateTime = Clock.System.now()
     return utcDateTime.toString()
@@ -13,4 +15,9 @@ fun currentUtcTimestamp(): String {
 //        utcDateTime.minute,
 //        utcDateTime.second
 //    )
+}
+
+@OptIn(ExperimentalTime::class)
+fun getTimeInMilliseconds(): Long {
+    return Clock.System.now().toEpochMilliseconds()
 }
