@@ -25,6 +25,8 @@ data class ChatSessionUpdateRequest(
 data class ChatSessionCreateResponse(
     @SerialName("chat_session_id")
     val chatSessionId: String,
+    @SerialName("title")
+    val title: String,
     @SerialName("message")
     val message: String = "Chat session created successfully"
 )

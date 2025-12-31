@@ -10,15 +10,18 @@ import org.dev.assistant.data.WebSocketClient
 import org.dev.assistant.data.model.ChatSessionResponse
 import org.dev.assistant.domain.ChatSessionService
 import org.dev.assistant.domain.UserService
+import org.dev.assistant.ui.chat.ChatSessionHandler
+import org.dev.assistant.ui.chat.ChatSessionItem
 
 class MainViewModel(
     private val chatSessionService: ChatSessionService,
     private val userService: UserService,
-    private val webSocketClient: WebSocketClient
+    private val webSocketClient: WebSocketClient,
+    private val chatSessionHandler: ChatSessionHandler
 ) : ViewModel() {
 
-    private val _chatSessions = MutableStateFlow<List<ChatSessionResponse>>(emptyList())
-    val chatSessions: StateFlow<List<ChatSessionResponse>> = _chatSessions.asStateFlow()
+    private val _chatSessions = MutableStateFlow<List<ChatSessionItem>>(emptyList())
+    val chatSessions: StateFlow<List<ChatSessionItem>> = chatSessionHandler.getChatSessions()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -49,12 +52,7 @@ class MainViewModel(
         _error.value = null
 
         chatSessionService.getUserChatSessions(includeArchived = false)
-            .onSuccess { sessions ->
-                _chatSessions.value = sessions.sortedByDescending { it.updatedAt }
-            }
-            .onFailure { throwable ->
-                _error.value = throwable.message ?: "Failed to load chat sessions"
-            }
+
 
         _isLoading.value = false
 
@@ -68,7 +66,7 @@ class MainViewModel(
             chatSessionService.deleteChatSession(sessionId)
                 .onSuccess {
                     // Remove the session from the list
-                    _chatSessions.value = _chatSessions.value.filter { it.chatSessionId != sessionId }
+                    _chatSessions.value = _chatSessions.value.filter { it.id != sessionId }
                 }
                 .onFailure { throwable ->
                     _error.value = throwable.message ?: "Failed to delete chat session"

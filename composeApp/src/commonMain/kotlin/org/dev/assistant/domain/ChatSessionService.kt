@@ -4,10 +4,13 @@ import org.dev.assistant.data.ChatSessionRepository
 import org.dev.assistant.data.model.ChatSessionCreateRequest
 import org.dev.assistant.data.model.ChatSessionResponse
 import org.dev.assistant.data.model.ChatSessionUpdateRequest
+import org.dev.assistant.ui.chat.ChatSessionHandler
+import org.dev.assistant.ui.chat.ChatSessionItem
 
 class ChatSessionService(
     private val userService: UserService,
-    private val chatSessionRepository: ChatSessionRepository
+    private val chatSessionRepository: ChatSessionRepository,
+    private val chatSessionHandler: ChatSessionHandler
 ) {
 
     suspend fun createChatSession(title: String?): Result<String> {
@@ -15,9 +18,19 @@ class ChatSessionService(
             val userId = userService.getUserId()
                 .getOrElse { throw IllegalStateException("User not authenticated", it) }
 
-            chatSessionRepository.createChatSession(
+            val response = chatSessionRepository.createChatSession(
                 ChatSessionCreateRequest(userId, title)
-            ).getOrThrow().chatSessionId
+            ).getOrThrow()
+            // update chat session handler
+            chatSessionHandler.addChatSession(
+                listOf(
+                    ChatSessionItem(
+                        response.chatSessionId,
+                        response.title
+                    )
+                )
+            )
+            response.chatSessionId
         }
     }
 
@@ -52,6 +65,15 @@ class ChatSessionService(
             val sessionList = chatSessionRepository.getUserChatSessions(userId, includeArchived)
                 .getOrThrow()
                 .chatSessions
+            // add to chat session handler
+            val list = sessionList.sortedByDescending { it.updatedAt }.map {
+                ChatSessionItem(
+                    it.chatSessionId,
+                    it.title ?: "",
+                    it.isArchived
+                )
+            }
+            chatSessionHandler.addChatSession(list)
             sessionList
         }
     }

@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.dev.assistant.Res
 import org.dev.assistant.app_heading
-import org.dev.assistant.data.model.ChatSessionResponse
 import org.dev.assistant.design_system.themes.dimension
 import org.dev.assistant.design_system.themes.navigationItemSpace
 import org.dev.assistant.design_system.ui.Heading
@@ -46,6 +45,7 @@ import org.dev.assistant.design_system.ui.SideNavigationItem
 import org.dev.assistant.home
 import org.dev.assistant.new_chat
 import org.dev.assistant.settings
+import org.dev.assistant.ui.chat.ChatSessionItem
 import org.dev.assistant.ui.main.MainViewModel
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -97,10 +97,10 @@ fun SideNavigationUI(
                                     modifier = Modifier.fillMaxWidth().weight(1f, fill = false)
                                 ) {
                                     items(chatSessions) { session ->
-                                        ChatSessionItem(
+                                        ChatSessionItemComposable(
                                             session = session,
-                                            onClick = { onChatSessionClick(session.chatSessionId) },
-                                            onDelete = { mainViewModel.deleteSession(session.chatSessionId) }
+                                            onClick = { onChatSessionClick(session.id) },
+                                            onDelete = { mainViewModel.deleteSession(session.id) }
                                         )
                                     }
                                 }
@@ -148,8 +148,8 @@ fun SideNavigationUI(
 }
 
 @Composable
-fun ChatSessionItem(
-    session: ChatSessionResponse,
+fun ChatSessionItemComposable(
+    session: ChatSessionItem,
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
