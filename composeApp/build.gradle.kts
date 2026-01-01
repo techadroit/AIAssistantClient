@@ -93,10 +93,11 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             // Material Icons Extended for multiplatform
             implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
             implementation(libs.androidx.datastore.preferences)
             implementation(libs.androidx.datastore)
+            implementation(libs.kermit)
 //            implementation(libs.coil.core)
 //            implementation(libs.coil.compose)
 //            implementation(libs.coil.network.ktor)

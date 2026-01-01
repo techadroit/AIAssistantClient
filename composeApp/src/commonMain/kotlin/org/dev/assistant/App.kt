@@ -2,17 +2,28 @@ package org.dev.assistant
 
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import co.touchlab.kermit.Severity
 import org.dev.assistant.design_system.themes.HomeTheme
 import org.dev.assistant.navigation.AppNavHost
 import org.dev.assistant.navigation.Screen
 import org.dev.assistant.ui.home.SideNavigationUI
+import org.dev.assistant.util.logger.LoggerInitializer
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
 fun App() {
+    // Initialize logger when app starts
+    LaunchedEffect(Unit) {
+        LoggerInitializer.initialize(
+            enableFileLogging = true,
+            minSeverity = Severity.Debug
+        )
+    }
+
     MainApp()
 }
 

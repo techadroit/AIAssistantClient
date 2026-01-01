@@ -1,8 +1,8 @@
 [versions]
 agp = "8.13.0"
-android-compileSdk = "34"
+android-compileSdk = "35"
 android-minSdk = "24"
-android-targetSdk = "34"
+android-targetSdk = "35"
 androidx-activityCompose = "1.9.3"
 androidx-appcompat = "1.7.0"
 androidx-constraintlayout = "2.2.0"
@@ -25,6 +25,7 @@ uiToolingPreviewVersion = "1.7.0"
 koin = "4.0.0"
 datastore = "1.1.1"
 navigation = "2.9.1"
+kermit = "2.0.4"
 
 [libraries]
 jetbrains-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreviewVersion" }
@@ -64,6 +65,7 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
 androidx-datastore = { module = "androidx.datastore:datastore-core", version.ref = "datastore" }
 androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
