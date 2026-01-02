@@ -16,7 +16,7 @@ import org.dev.assistant.ui.chat.ChatSessionItem
 class MainViewModel(
     private val chatSessionService: ChatSessionService,
     private val userService: UserService,
-    private val webSocketClient: WebSocketClient,
+    val webSocketClient: WebSocketClient,
     private val chatSessionHandler: ChatSessionHandler
 ) : ViewModel() {
 

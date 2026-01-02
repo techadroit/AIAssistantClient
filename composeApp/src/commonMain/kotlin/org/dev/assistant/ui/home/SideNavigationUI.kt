@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,6 +39,7 @@ import org.dev.assistant.Res
 import org.dev.assistant.app_heading
 import org.dev.assistant.design_system.themes.dimension
 import org.dev.assistant.design_system.themes.navigationItemSpace
+import org.dev.assistant.design_system.themes.primaryColorLight
 import org.dev.assistant.design_system.ui.Heading
 import org.dev.assistant.design_system.ui.LabelItem
 import org.dev.assistant.design_system.ui.SideNavigationDivider
@@ -63,6 +65,7 @@ fun SideNavigationUI(
 ) {
     val mainViewModel: MainViewModel = koinViewModel()
     val chatSessions by mainViewModel.chatSessions.collectAsState()
+    val isWebSocketConnected by mainViewModel.webSocketClient.isConnected.collectAsState()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
     val drawerMinWidth = MaterialTheme.dimension().drawerMinWidth
@@ -115,6 +118,51 @@ fun SideNavigationUI(
                         // Settings Section at the bottom
                         Column {
                             SideNavigationDivider()
+
+                            // WebSocket Connection Status
+                            SideNavigationItem(
+                                onClick = {
+                                    if (isWebSocketConnected) {
+                                        mainViewModel.webSocketClient.disconnect()
+                                    } else {
+                                        mainViewModel.webSocketClient.connect()
+                                    }
+                                }
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(
+                                            color = primaryColorLight.copy(alpha = 0.1f),
+                                            shape = MaterialTheme.shapes.small
+                                        )
+                                        .padding(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Warning,
+                                        contentDescription = "Connection Status",
+                                        modifier = Modifier
+                                            .size(32.dp)
+
+                                            .padding(6.dp),
+                                        tint = if (isWebSocketConnected) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.error
+                                        }
+                                    )
+                                    LabelItem(
+                                        text = if (isWebSocketConnected) {
+                                            "Connected"
+                                        } else {
+                                            "Disconnected"
+                                        }
+                                    )
+                                }
+                            }
+
                             SideNavigationItem(onClick = onNavigateToSettings) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,

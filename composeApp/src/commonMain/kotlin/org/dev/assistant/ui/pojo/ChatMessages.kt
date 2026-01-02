@@ -12,10 +12,6 @@ data class ChatMessageBody(
 
 @Serializable
 enum class ChatModeType(val value: String) {
-    @SerialName("document")
-    DOCUMENT("document"),
-    @SerialName("websearch")
-    WEBSEARCH("websearch"),
     @SerialName("agent")
     AGENT("agent"),
     @SerialName("offline")
