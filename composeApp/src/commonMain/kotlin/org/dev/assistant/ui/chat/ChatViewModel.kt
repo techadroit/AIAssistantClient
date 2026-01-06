@@ -46,7 +46,7 @@ class ChatViewModel(
     val uploadState: StateFlow<UploadState> = _uploadState
 
     // Agent mode state
-    private val _chatMode = MutableStateFlow(ChatModeType.OFFLINE)
+    private val _chatMode = MutableStateFlow(ChatModeType.AGENT)
     val chatMode: StateFlow<ChatModeType> = _chatMode
 
     // Base URL for your FastAPI server
